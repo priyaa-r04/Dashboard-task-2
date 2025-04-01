@@ -158,6 +158,7 @@ const SignUp = () => {
                         </div>
                         <div>
                             <Button
+                                loading={loading}
                                 color="primary"
                                 variant="contained"
                                 fullWidth
