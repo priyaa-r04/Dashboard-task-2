@@ -1,66 +1,207 @@
+import React, { useState, useContext } from "react";
 import { useFormik } from "formik";
-import React from "react";
 import { useNavigate } from "react-router-dom";
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+import * as Yup from 'yup';
+import { UserContext } from "../ContextAPI/UserContext";
+import backgroundImage from '../assets/bg-signup.jpg'
+import { Checkbox, FormControlLabel } from "@mui/material";
+
+const LoginSchema = Yup.object().shape({
+  email: Yup.string().email('Invalid email').required('Email is Required'),
+  password: Yup.string().min(6, 'Password length must be 6').required('Password is Required'),
+});
 
 const LoginForm = () => {
+  const { checkCredentials } = useContext(UserContext);
   const navigate = useNavigate();
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [errorSnackbar, setErrorSnackbar] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+
   const formik = useFormik({
     initialValues: {
       email: "",
       password: "",
     },
-
-    onSubmit: () => {
-      
-      navigate("/dashboard");
+    validationSchema: LoginSchema,
+    onSubmit: (values) => {
+      const isValid = checkCredentials(values.email, values.password);
+      if (isValid) {
+        setOpenSnackbar(true);
+        if (rememberMe) {
+          localStorage.setItem("rememberMe", JSON.stringify(values));
+        } else {
+          localStorage.removeItem("rememberMe");
+        }
+        setTimeout(() => navigate("/dashboard"), 2000);
+      } else {
+        setErrorSnackbar(true);
+      }
     },
   });
 
+  const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === "clickaway") return;
+    setOpenSnackbar(false);
+    setErrorSnackbar(false);
+  };
+
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-md">
-        <h1 className="text-2xl font-bold text-center text-gray-800 mb-4">Login</h1>
-        <form onSubmit={formik.handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-600 mb-1">
-              Email Address
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="Enter your Email"
-              onChange={formik.handleChange}
-              value={formik.values.email}
-              className="w-full border rounded-md py-2 px-3 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
+    <>
+      <div
+        className="flex justify-center items-center min-h-screen bg-cover bg-center"
+        style={{ backgroundImage: `url(${backgroundImage})` }}
+      >
+        <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-md">
+          <h1 className="text-2xl font-bold text-center text-gray-800 mb-4">Login</h1>
+
+          <form onSubmit={formik.handleSubmit} className="space-y-4">
+            <div>
+              <TextField
+                fullWidth
+                id="email"
+                name="email"
+                label="Email Address"
+                type="email"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className="w-full"
+                error={formik.touched.email && Boolean(formik.errors.email)}
+                helperText={formik.touched.email && formik.errors.email}
+                sx={{
+                  '& .MuiInputLabel-root.Mui-focused': {
+                    color: '#881337',
+                  },
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: '#881337',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#701a30',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#701a30',
+                    },
+                  },
+                }}
+              />
+            </div>
+            <div>
+              <TextField
+                fullWidth
+                id="password"
+                name="password"
+                label="Password"
+                type={"password"}
+                placeholder="Enter your Password"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className="w-full"
+                error={formik.touched.password && Boolean(formik.errors.password)}
+                helperText={formik.touched.password && formik.errors.password}
+
+                sx={{
+                  '& .MuiInputLabel-root.Mui-focused': {
+                    color: '#881337',
+                  },
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: '#881337',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#701a30',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#701a30',
+                    },
+                  },
+                }}
+              />
+            </div>
+
+            <div className="flex items-center">
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    sx={{
+                      color: '#881337',
+                      '&.Mui-checked': {
+                        color: '#701a30',
+                      },
+                    }}
+                  />
+                }
+                label="Remember Me"
+              />
+            </div>
+
+            <div>
+              <Button
+                color="primary"
+                variant="contained"
+                fullWidth
+                type="submit"
+                sx={{
+                  backgroundColor: '#881337',
+                  '&:hover': { backgroundColor: '#701a30' }
+                }}
+              >
+                Login
+              </Button>
+            </div>
+
+          </form>
+
+          <div className="text-center mt-4">
+            <p className="text-gray-600">
+              New User?{" "}
+              <span
+                className="font-semibold cursor-pointer hover:underline"
+                style={{ color: "#B02A47" }}
+                onClick={() => navigate("/signup")}
+              >
+                Signup Here
+              </span>
+            </p>
           </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-600 mb-1">
-              Password
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="Enter your Password"
-              onChange={formik.handleChange}
-              value={formik.values.password}
-              className="w-full border rounded-md py-2 px-3 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
-          </div>
-          <div>
-            <button
-              type="submit"
-              className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-200 text-sm"
-            >
-              Login
-            </button>
-          </div>
-        </form>
+
+
+          <Snackbar
+            anchorOrigin={{ horizontal: "center", vertical: "top" }}
+            open={openSnackbar}
+            autoHideDuration={2000}
+            onClose={handleSnackbarClose}
+          >
+            <Alert severity="success" sx={{ width: "100%" }}>
+              Login successful!
+            </Alert>
+          </Snackbar>
+
+          <Snackbar
+          anchorOrigin={{ horizontal: "center", vertical: "top" }}
+            open={errorSnackbar}
+            autoHideDuration={2000}
+            onClose={handleSnackbarClose}
+          >
+            <Alert severity="error" sx={{ width: "100%" }}>
+              Invalid email or password!
+            </Alert>
+          </Snackbar>
+
+        </div>
       </div>
-    </div>
+
+
+    </>
   );
 };
+
+
 
 export default LoginForm;

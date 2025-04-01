@@ -1,12 +1,13 @@
-import  { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import TextField from '@mui/material/TextField';
 import { useFormik } from 'formik';
 import Button from '@mui/material/Button';
 import backgroundImage from '../assets/bg-signup.jpg'
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
-import { UserContext } from "./UserContext";
-
+import { UserContext } from "../ContextAPI/UserContext";
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert'
 
 const SignupSchema = Yup.object().shape({
     name: Yup.string().required('Name is Required'),
@@ -16,8 +17,17 @@ const SignupSchema = Yup.object().shape({
 
 const SignUp = () => {
     const { addUser } = useContext(UserContext)!;
+    const [open, setOpen] = useState(false);
+    const [loading , setLoading] = useState(false);
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            setLoading(false);
+        }, 2000);
+        return () => clearTimeout(timeout);
+    });
 
     const formik = useFormik({
         initialValues: {
@@ -29,11 +39,18 @@ const SignUp = () => {
         onSubmit: (values) => {
             console.log(values);
             addUser(values);
-            navigate("/login")
+            setOpen(true);
+            setTimeout(() => navigate("/login"), 2000);
+            console.log(open);
         },
 
 
     });
+    const handleClose = (event: React.SyntheticEvent | Event, reason: string) => {
+        if (reason === 'clickaway') return;
+        setOpen(false);
+    };
+
 
     return (
         <>
@@ -41,7 +58,7 @@ const SignUp = () => {
                 className="flex justify-center items-center min-h-screen bg-cover bg-center"
                 style={{ backgroundImage: `url(${backgroundImage})` }}
             >
-                <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-md">
+                <div className="bg-white shadow-xl  rounded-xl p-6 w-full max-w-md">
                     <h1 className="text-2xl font-bold text-center text-gray-800 mb-4">Sign Up</h1>
 
 
@@ -56,8 +73,24 @@ const SignUp = () => {
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
                                 className="w-full"
-                                error={formik.touched.name && Boolean(formik.errors.name)} 
-                                helperText={formik.touched.name && formik.errors.name} 
+                                error={formik.touched.name && Boolean(formik.errors.name)}
+                                helperText={formik.touched.name && formik.errors.name}
+                                sx={{
+                                    '& .MuiInputLabel-root.Mui-focused': {
+                                        color: '#881337',
+                                    },
+                                    '& .MuiOutlinedInput-root': {
+                                        '& fieldset': {
+                                            borderColor: '#881337',
+                                        },
+                                        '&:hover fieldset': {
+                                            borderColor: '#701a30',
+                                        },
+                                        '&.Mui-focused fieldset': {
+                                            borderColor: '#701a30',
+                                        },
+                                    },
+                                }}
 
                             />
                         </div>
@@ -71,10 +104,25 @@ const SignUp = () => {
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
                                 className="w-full"
-                                error={formik.touched.email && Boolean(formik.errors.email)} 
-                                helperText={formik.touched.email && formik.errors.email} 
+                                error={formik.touched.email && Boolean(formik.errors.email)}
+                                helperText={formik.touched.email && formik.errors.email}
 
-
+                                sx={{
+                                    '& .MuiInputLabel-root.Mui-focused': {
+                                        color: '#881337',
+                                    },
+                                    '& .MuiOutlinedInput-root': {
+                                        '& fieldset': {
+                                            borderColor: '#881337',
+                                        },
+                                        '&:hover fieldset': {
+                                            borderColor: '#701a30',
+                                        },
+                                        '&.Mui-focused fieldset': {
+                                            borderColor: '#701a30',
+                                        },
+                                    },
+                                }}
                             />
                         </div>
                         <div>
@@ -83,13 +131,29 @@ const SignUp = () => {
                                 id="password"
                                 name="password"
                                 label="Password"
+                                type={'password'}
                                 value={formik.values.password}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
                                 className="w-full"
-                                error={formik.touched.password && Boolean(formik.errors.password)} 
-                                helperText={formik.touched.password && formik.errors.password} 
-
+                                error={formik.touched.password && Boolean(formik.errors.password)}
+                                helperText={formik.touched.password && formik.errors.password}
+                                sx={{
+                                    '& .MuiInputLabel-root.Mui-focused': {
+                                        color: '#881337',
+                                    },
+                                    '& .MuiOutlinedInput-root': {
+                                        '& fieldset': {
+                                            borderColor: '#881337',
+                                        },
+                                        '&:hover fieldset': {
+                                            borderColor: '#701a30',
+                                        },
+                                        '&.Mui-focused fieldset': {
+                                            borderColor: '#701a30',
+                                        },
+                                    },
+                                }}
                             />
                         </div>
                         <div>
@@ -103,6 +167,17 @@ const SignUp = () => {
                             </Button>
                         </div>
                     </form>
+                    <Snackbar
+                        anchorOrigin={{ horizontal: "center", vertical: "top" }}
+                        open={open}
+                        autoHideDuration={2000}
+                        onClose={handleClose}>
+
+                        <Alert severity="success" sx={{ width: '100%' }}>
+                            User successfully registered!
+                        </Alert>
+                    </Snackbar>
+
                 </div>
             </div>
         </>
