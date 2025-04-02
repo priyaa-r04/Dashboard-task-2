@@ -9,6 +9,7 @@ import * as Yup from 'yup';
 import { UserContext } from "../ContextAPI/UserContext";
 import backgroundImage from '../assets/bg-signup.jpg'
 import { Checkbox, FormControlLabel } from "@mui/material";
+import SimpleBackdrop from "./Loader"
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Email is Required'),
@@ -21,6 +22,7 @@ const LoginForm = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [errorSnackbar, setErrorSnackbar] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [loaderState, setLoaderState] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -29,18 +31,22 @@ const LoginForm = () => {
     },
     validationSchema: LoginSchema,
     onSubmit: (values) => {
-      const isValid = checkCredentials(values.email, values.password);
-      if (isValid) {
-        setOpenSnackbar(true);
-        if (rememberMe) {
-          localStorage.setItem("rememberMe", JSON.stringify(values));
+      setLoaderState(true); 
+      setTimeout(() => {
+        const isValid = checkCredentials(values.email, values.password);
+        setLoaderState(false); 
+        if (isValid) {
+          setOpenSnackbar(true);
+          if (rememberMe) {
+            localStorage.setItem("rememberMe", JSON.stringify(values));
+          } else {
+            localStorage.removeItem("rememberMe");
+          }
+          setTimeout(() => navigate("/dashboard"), 2000);
         } else {
-          localStorage.removeItem("rememberMe");
+          setErrorSnackbar(true);
         }
-        setTimeout(() => navigate("/dashboard"), 2000);
-      } else {
-        setErrorSnackbar(true);
-      }
+      }, 2000);
     },
   });
 
@@ -52,6 +58,7 @@ const LoginForm = () => {
 
   return (
     <>
+    <SimpleBackdrop loaderState={loaderState} setOpen={setLoaderState} />
       <div
         className="flex justify-center items-center min-h-screen bg-cover bg-center"
         style={{ backgroundImage: `url(${backgroundImage})` }}
@@ -147,12 +154,13 @@ const LoginForm = () => {
                 variant="contained"
                 fullWidth
                 type="submit"
+                disabled={loaderState}
                 sx={{
                   backgroundColor: '#881337',
                   '&:hover': { backgroundColor: '#701a30' }
                 }}
               >
-                Login
+                {loaderState ? "Logging In..." : "Login"}
               </Button>
             </div>
 
