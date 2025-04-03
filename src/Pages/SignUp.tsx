@@ -12,14 +12,14 @@ import SimpleBackdrop from "./Loader";
 
 const SignupSchema = Yup.object().shape({
     name: Yup
-    .string()
-    .matches(/^[a-zA-Z\s]+$/, 'Name must contain only letters and spaces')
-    .required('Name is Required'),
+        .string()
+        .matches(/^[a-zA-Z\s]+$/, 'Name must contain only letters and spaces')
+        .required('Name is Required'),
     email: Yup.string().email('Invalid email').required('Email is Required'),
     password: Yup
-    .string()
-    .min(6, 'Password length must be 6')
-    .matches(/^(?=.*[A-Z])(?=.*[\d!@#$%^&*(),.?":{}|<>]).*$/, 
+        .string()
+        .min(6, 'Password length must be 6')
+        .matches(/^(?=.*[A-Z])(?=.*[\d!@#$%^&*(),.?":{}|<>]).*$/,
             'Password must contain at least one uppercase letter and one number or special character')
         .required('Password is Required'),
 });
@@ -42,17 +42,17 @@ const SignUp = () => {
             console.log(values);
             setLoaderState(true);
             addUser(values);
-            
+
             setTimeout(() => {
                 setLoaderState(false);
-                setOpen(true); 
-        
+                setOpen(true);
+
                 setTimeout(() => {
-                    navigate("/login"); 
-                }, 2000); 
+                    navigate("/login");
+                }, 2000);
             }, 2000);
         },
-        
+
 
     });
     const handleClose = (event: React.SyntheticEvent | Event, reason: string) => {
@@ -63,13 +63,13 @@ const SignUp = () => {
 
     return (
         <>
-        <SimpleBackdrop loaderState={loaderState} setOpen={setLoaderState} />
+            <SimpleBackdrop loaderState={loaderState} setOpen={setLoaderState} />
             <div
                 className="flex justify-center items-center min-h-screen bg-cover bg-center"
                 style={{ backgroundImage: `url(${backgroundImage})` }}
             >
                 <div className="bg-white shadow-xl  rounded-xl p-6 w-full max-w-md">
-                    <h1 className="text-2xl font-bold text-center text-gray-800 mb-4">Sign Up Page</h1>
+                    <h1 className="text-2xl font-bold text-center text-gray-800 mb-4">Sign Up</h1>
 
 
                     <form onSubmit={formik.handleSubmit} className="space-y-4">
@@ -166,19 +166,33 @@ const SignUp = () => {
                                 }}
                             />
                         </div>
-                        <div>
+                        <div className="mt-4 text-center">
                             <Button
                                 color="primary"
                                 variant="contained"
                                 fullWidth
                                 type="submit"
                                 disabled={loaderState}
-                                sx={{ backgroundColor: '#881337', '&:hover': { backgroundColor: '#701a30' } }}>
+                                sx={{ backgroundColor: '#881337', '&:hover': { backgroundColor: '#701a30' } }}
+                            >
                                 {loaderState ? "Signing Up..." : "Sign Up"}
                             </Button>
                         </div>
                     </form>
-                    
+
+                    <div className="text-center mt-4">
+                        <p className="text-gray-600">
+                            Already Registered?{" "}
+                            <span
+                                className="font-semibold cursor-pointer hover:underline"
+                                style={{ color: "#B02A47" }}
+                                onClick={() => navigate("/login")}
+                            >
+                                Login Here
+                            </span>
+                        </p>
+                    </div>
+
                     <Snackbar
                         anchorOrigin={{ horizontal: "center", vertical: "top" }}
                         open={open}
