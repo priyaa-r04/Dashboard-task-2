@@ -31,10 +31,10 @@ const LoginForm = () => {
     },
     validationSchema: LoginSchema,
     onSubmit: (values) => {
-      setLoaderState(true); 
+      setLoaderState(true);
       setTimeout(() => {
         const isValid = checkCredentials(values.email, values.password);
-        setLoaderState(false); 
+        setLoaderState(false);
         if (isValid) {
           setOpenSnackbar(true);
           if (rememberMe) {
@@ -58,7 +58,7 @@ const LoginForm = () => {
 
   return (
     <>
-    <SimpleBackdrop loaderState={loaderState} setOpen={setLoaderState} />
+      <SimpleBackdrop loaderState={loaderState} setOpen={setLoaderState} />
       <div
         className="flex justify-center items-center min-h-screen bg-cover bg-center"
         style={{ backgroundImage: `url(${backgroundImage})` }}
@@ -192,7 +192,7 @@ const LoginForm = () => {
           </Snackbar>
 
           <Snackbar
-          anchorOrigin={{ horizontal: "center", vertical: "top" }}
+            anchorOrigin={{ horizontal: "center", vertical: "top" }}
             open={errorSnackbar}
             autoHideDuration={2000}
             onClose={handleSnackbarClose}
