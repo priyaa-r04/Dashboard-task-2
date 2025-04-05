@@ -57,6 +57,7 @@ const SignUp = () => {
     });
     const handleClose = (event: React.SyntheticEvent | Event, reason: string) => {
         if (reason === 'clickaway') return;
+        console.log(event);
         setOpen(false);
     };
 
