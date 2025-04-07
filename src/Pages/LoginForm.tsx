@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext , useEffect} from "react";
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
 import TextField from '@mui/material/TextField';
@@ -37,11 +37,9 @@ const LoginForm = () => {
         setLoaderState(false);
         if (isValid) {
           setOpenSnackbar(true);
-          if (rememberMe) {
-            localStorage.setItem("rememberMe", JSON.stringify(values));
-          } else {
-            localStorage.removeItem("rememberMe");
-          }
+
+          localStorage.setItem("userData", JSON.stringify(values));
+
           setTimeout(() => navigate("/dashboard"), 2000);
         } else {
           setErrorSnackbar(true);
@@ -50,8 +48,17 @@ const LoginForm = () => {
     },
   });
 
+  useEffect(() => {
+    const savedUser = JSON.parse(localStorage.getItem("userData") || '{}');
+
+    if (savedUser) {
+      formik.setValues(savedUser); 
+    }
+  }, []);
+
   const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === "clickaway") return;
+    console.log(event);
     setOpenSnackbar(false);
     setErrorSnackbar(false);
   };

@@ -1,15 +1,22 @@
 import { Logout, Settings } from "@mui/icons-material";
 import { Avatar, IconButton, ListItemIcon, Menu, MenuItem, Stack, TextField, Tooltip } from "@mui/material";
 import { ThemeSwitcher } from "@toolpad/core";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { UserContext } from "../ContextAPI/UserContext";
 import { useNavigate } from "react-router-dom";
 import SearchIcon from "@mui/icons-material/Search";
 
 
 const ToolbarActionsSearch = () => {
+    const { users } = useContext(UserContext);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const navigate = useNavigate();
+
+    const currentUser = users[0];
+
+    const userInitial = currentUser?.name.charAt(0).toUpperCase();
+
 
     const handleLogout = () => {
         navigate("/login");
@@ -56,7 +63,9 @@ const ToolbarActionsSearch = () => {
             />
             <ThemeSwitcher />
             <IconButton onClick={handleClick}>
-                <Avatar />
+            <Avatar sx={{ bgcolor: "primary.main" }}>
+                    {userInitial}
+                </Avatar>
             </IconButton>
             <Menu
                 anchorEl={anchorEl}

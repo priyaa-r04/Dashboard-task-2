@@ -4,6 +4,7 @@ import LoginForm from './Pages/LoginForm';
 import SignUp from './Pages/SignUp';
 import Dashboard from "./Pages/Dashboard";
 import { UserProvider } from "./ContextAPI/UserContext";
+import Tables from './Components/Tables';
 
 
 
@@ -17,6 +18,7 @@ const App = () => {
             <Route path="/login" element={<LoginForm />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/tables" element={<Tables />} />
           </Routes>
         </Router>
       </UserProvider>

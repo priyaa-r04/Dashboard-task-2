@@ -41,6 +41,9 @@ const SignUp = () => {
         onSubmit: (values) => {
             console.log(values);
             setLoaderState(true);
+
+            localStorage.setItem('userData', JSON.stringify(values));
+
             addUser(values);
 
             setTimeout(() => {
@@ -117,7 +120,7 @@ const SignUp = () => {
                                 error={formik.touched.email && Boolean(formik.errors.email)}
                                 helperText={formik.touched.email && formik.errors.email}
 
-                                sx={{
+                                sx={{   
                                     '& .MuiInputLabel-root.Mui-focused': {
                                         color: '#881337',
                                     },
