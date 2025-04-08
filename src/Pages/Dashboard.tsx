@@ -6,6 +6,8 @@ import { UserContext } from "../ContextAPI/UserContext";
 import { useDemoRouter } from "@toolpad/core/internal";
 import ToolbarActionsSearch from "../Components/ToolbarActionsSearch";
 import Tables from "../Components/Tables";
+import { BarChart } from '../Components/BarChart';
+
 const demoTheme = createTheme({
     cssVariables: {
         colorSchemeSelector: "data-toolpad-color-scheme",
@@ -41,7 +43,10 @@ function DemoPageContent({ pathname }: { pathname: string }) {
         >
 
             {pathname === "/dashboard" && (
-                <Typography variant="h5">Welcome to the Dashboard</Typography>
+                <div className="p-3">
+                    {/* <Typography variant="h5">Welcome to the Dashboard</Typography> */}
+                    <BarChart />
+                </div>
             )}
             {pathname === "/users" && (
                 <div>
@@ -71,17 +76,17 @@ const Dashboard = () => {
                     toolbarActions: ToolbarActionsSearch,
                 }}
             >
-               <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+                <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
                     <DemoPageContent pathname={router.pathname} />
                     {router.pathname === "/users" && (
-                        <Box sx={{ p: 2, mt: "auto" }}> 
+                        <Box sx={{ p: 2, mt: "auto" }}>
                             <Typography variant="h6" textAlign="center">
                                 Total Users: {users?.length || 0}
                             </Typography>
                         </Box>
                     )}
                 </Box>
-                
+
             </DashboardLayout>
         </AppProvider>
     );
