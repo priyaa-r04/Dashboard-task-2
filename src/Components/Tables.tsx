@@ -12,32 +12,32 @@ import {
     Typography,
     Snackbar,
     Alert,
+    TablePagination,
 } from "@mui/material";
 import { Visibility, Delete,Close} from "@mui/icons-material";
 import { UserContext,User } from "../ContextAPI/UserContext";
 
 const Tables = () => {
-    const { users, deleteUser } = useContext(UserContext); // Access users and deleteUser from context
+    const { users, deleteUser } = useContext(UserContext); 
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [openModal, setOpenModal] = useState(false);
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState("");
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
 
-    // Open modal and set selected user
     const handleOpenModal = (user: User) => {
         setSelectedUser(user);
         setOpenModal(true);
     };
 
-    // Close modal and reset selected user
     const handleCloseModal = () => {
         setOpenModal(false);
         setSelectedUser(null);
     };
 
-    // Delete user and show a Snackbar notification
     const handleDelete = (email: string) => {
-        deleteUser(email); // Call deleteUser from context
+        deleteUser(email); 
         setSnackbarMessage("User deleted successfully!");
         setOpenSnackbar(true);
     };
@@ -47,6 +47,20 @@ const Tables = () => {
     ) => {
         if (reason === "clickaway") return;
         setOpenSnackbar(false);
+    };
+
+    const handleChangePage = (
+        event: React.MouseEvent<HTMLButtonElement> | null,
+        newPage: number
+    ) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (
+        event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    ) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
     };
 
     return (
@@ -68,11 +82,9 @@ const Tables = () => {
                             <TableCell>{user.email}</TableCell>
                             <TableCell>{user.password}</TableCell>
                             <TableCell align="center">
-                                {/* View User Button */}
                                 <IconButton onClick={() => handleOpenModal(user)}>
                                     <Visibility sx={{ color: "primary.main" }} />
                                 </IconButton>
-                                {/* Delete User Button */}
                                 <IconButton
                                     onClick={() => handleDelete(user.email)}
                                     sx={{ ml: 2 }}
@@ -84,6 +96,15 @@ const Tables = () => {
                     ))}
                 </TableBody>
             </Table>
+
+            <TablePagination
+                component="div"
+                count={users.length}
+                page={page}
+                onPageChange={handleChangePage}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+            />
 
             <Modal
                 open={openModal}
