@@ -35,22 +35,17 @@ function DemoPageContent({ pathname }: { pathname: string }) {
         <Box
             sx={{
                 py: 4,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                textAlign: "center",
+                width: "100%",
             }}
         >
-
             {pathname === "/dashboard" && (
                 <div className="p-3">
-                    {/* <Typography variant="h5">Welcome to the Dashboard</Typography> */}
-                    <BarChart />
+                <BarChart />
                 </div>
             )}
             {pathname === "/users" && (
                 <div>
-                    <Typography variant="h5">Users Data</Typography>
+                    <Typography variant="h5"  sx={{ ml:4}}>Users Data</Typography>
                     <Tables />
                 </div>
             )}
