@@ -7,6 +7,9 @@ import { useDemoRouter } from "@toolpad/core/internal";
 import ToolbarActionsSearch from "../Components/ToolbarActionsSearch";
 import Tables from "../Components/Tables";
 import { BarChart } from '../Components/BarChart';
+import {LineChart} from "../Components/LineChart"
+import { RadarChart } from "../Components/RadarChart";
+import { DoughnutChart } from "../Components/DoughnutChart";
 
 const demoTheme = createTheme({
     cssVariables: {
@@ -39,9 +42,26 @@ function DemoPageContent({ pathname }: { pathname: string }) {
             }}
         >
             {pathname === "/dashboard" && (
-                <div className="p-3">
-                <BarChart />
+                <div className="grid grid-cols-2 gap-x-7 gap-y-10 p-5">
+                <div className="h-72 w-full p-6 bg-white rounded-lg shadow-md flex justify-center items-center">
+                  <BarChart />
                 </div>
+                <div className="h-72 w-full p-6 bg-white rounded-lg shadow-md flex justify-center items-center">
+                  <LineChart />
+                </div>
+                <div className="h-72 w-full p-6 bg-white rounded-lg shadow-md flex justify-center items-center">
+                  <RadarChart />
+                </div>
+                <div className="h-72 w-full p-6 bg-white rounded-lg shadow-md flex justify-center items-center">
+                  <DoughnutChart />
+                </div>
+              </div>
+              
+              
+              
+              
+              
+              
             )}
             {pathname === "/users" && (
                 <div>

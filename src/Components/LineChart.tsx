@@ -4,8 +4,8 @@ import { CChart } from '@coreui/react-chartjs'
 import { Chart } from 'chart.js'
 import type { ChartData, ChartOptions } from 'chart.js'
 
-export const BarChart = () => {
-  const chartRef = useRef<Chart<'bar'> | null>(null)
+export const LineChart = () => {
+  const chartRef = useRef<Chart<'line'> | null>(null)
 
   useEffect(() => {
     const handleColorSchemeChange = () => {
@@ -46,19 +46,31 @@ export const BarChart = () => {
     }
   }, [])
 
-  const data: ChartData<'bar'> = {
-    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September'], // 9 labels
+  const data: ChartData<'line'> = {
+    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September'],
     datasets: [
       {
-        label: 'GitHub Commits',
-        backgroundColor: '#f87979',
-        borderColor: '#f87979',
+        label: 'My First dataset',
+        backgroundColor: 'rgba(220, 220, 220, 0.2)',
+        borderColor: 'rgba(220, 220, 220, 1)',
+        pointBackgroundColor: 'rgba(220, 220, 220, 1)',
+        pointBorderColor: '#fff',
         data: [40, 20, 12, 39, 10, 40, 39, 80, 40],
+        fill: true,
+      },
+      {
+        label: 'My Second dataset',
+        backgroundColor: 'rgba(151, 187, 205, 0.2)',
+        borderColor: 'rgba(151, 187, 205, 1)',
+        pointBackgroundColor: 'rgba(151, 187, 205, 1)',
+        pointBorderColor: '#fff',
+        data: [50, 12, 28, 29, 7, 25, 12, 70, 60],
+        fill: true,
       },
     ],
   }
 
-  const options: ChartOptions<'bar'> = {
+  const options: ChartOptions<'line'> = {
     plugins: {
       legend: {
         labels: {
@@ -88,5 +100,5 @@ export const BarChart = () => {
     },
   }
 
-  return <CChart type="bar" data={data} options={options} ref={chartRef} />
+  return <CChart type="line" data={data} options={options} ref={chartRef} />
 }

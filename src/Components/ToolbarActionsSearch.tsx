@@ -1,11 +1,9 @@
 import { Logout, Settings } from "@mui/icons-material";
-import { Avatar, IconButton, ListItemIcon, Menu, MenuItem, Stack, TextField, Tooltip } from "@mui/material";
+import { Avatar, IconButton, ListItemIcon, Menu, MenuItem, Stack, Tooltip } from "@mui/material";
 import { ThemeSwitcher } from "@toolpad/core";
 import { useContext, useState } from "react";
 import { UserContext } from "../ContextAPI/UserContext";
 import { useNavigate } from "react-router-dom";
-import SearchIcon from "@mui/icons-material/Search";
-
 
 const ToolbarActionsSearch = () => {
     const { users } = useContext(UserContext);
@@ -41,26 +39,9 @@ const ToolbarActionsSearch = () => {
                             display: { xs: "inline", md: "none" },
                         }}
                     >
-                        <SearchIcon />
                     </IconButton>
                 </div>
             </Tooltip>
-            <TextField
-                label="Search"
-                variant="outlined"
-                size="small"
-                slotProps={{
-                    input: {
-                        endAdornment: (
-                            <IconButton type="button" aria-label="search" size="small">
-                                <SearchIcon />
-                            </IconButton>
-                        ),
-                        sx: { pr: 0.5 },
-                    },
-                }}
-                sx={{ display: { xs: "none", md: "inline-block" }, mr: 1 }}
-            />
             <ThemeSwitcher />
             <IconButton onClick={handleClick}>
             <Avatar sx={{ bgcolor: "primary.main" }}>

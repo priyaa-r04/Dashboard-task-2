@@ -142,7 +142,7 @@ const Tables = () => {
                         variant="contained"
                         color="primary"
                         onClick={() => setOpenAddUserDialog(true)}
-                        sx={{ ml: "auto" }} // Add User positioned to the right
+                        sx={{ ml: "auto" }}
                     >
                         Add User
                     </Button>
