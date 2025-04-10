@@ -1,4 +1,4 @@
-import React, { useState, useContext , useEffect} from "react";
+import { useState, useContext , useEffect} from "react";
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
 import TextField from '@mui/material/TextField';
@@ -56,7 +56,7 @@ const LoginForm = () => {
     }
   }, []);
 
-  const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: string) => {
+  const handleSnackbarClose = (_: any | Event, reason?: string) => {
     if (reason === "clickaway") return;
     setOpenSnackbar(false);
     setErrorSnackbar(false);

@@ -22,7 +22,7 @@ const ToolbarActionsSearch = () => {
         navigate("/login");
     };
 
-    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    const handleClick = (event: any) => {
         setAnchorEl(event.currentTarget);
     };
 
