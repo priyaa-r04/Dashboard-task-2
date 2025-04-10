@@ -41,6 +41,7 @@ const SignUp = () => {
         onSubmit: (values) => {
             console.log(values);
             setLoaderState(true);
+            console.log(values);
 
             localStorage.setItem('userData', JSON.stringify(values));
 
