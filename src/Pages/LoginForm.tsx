@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import { useState, useContext , useEffect} from "react";
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
 import TextField from '@mui/material/TextField';
@@ -9,6 +9,7 @@ import * as Yup from 'yup';
 import { UserContext } from "../ContextAPI/UserContext";
 import backgroundImage from '../assets/bg-signup.jpg'
 import { Checkbox, FormControlLabel } from "@mui/material";
+import SimpleBackdrop from "./Loader"
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Email is Required'),
@@ -21,6 +22,7 @@ const LoginForm = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [errorSnackbar, setErrorSnackbar] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [loaderState, setLoaderState] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -29,22 +31,32 @@ const LoginForm = () => {
     },
     validationSchema: LoginSchema,
     onSubmit: (values) => {
-      const isValid = checkCredentials(values.email, values.password);
-      if (isValid) {
-        setOpenSnackbar(true);
-        if (rememberMe) {
-          localStorage.setItem("rememberMe", JSON.stringify(values));
+      setLoaderState(true);
+      setTimeout(() => {
+        const isValid = checkCredentials(values.email, values.password);
+        setLoaderState(false);
+        if (isValid) {
+          setOpenSnackbar(true);
+
+          localStorage.setItem("userData", JSON.stringify(values));
+
+          setTimeout(() => navigate("/dashboard"), 2000);
         } else {
-          localStorage.removeItem("rememberMe");
+          setErrorSnackbar(true);
         }
-        setTimeout(() => navigate("/dashboard"), 2000);
-      } else {
-        setErrorSnackbar(true);
-      }
+      }, 2000);
     },
   });
 
-  const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: string) => {
+  useEffect(() => {
+    const savedUser = JSON.parse(localStorage.getItem("userData") || '{}');
+
+    if (savedUser && savedUser.email) {
+      formik.setValues(savedUser); 
+    }
+  }, []);
+
+  const handleSnackbarClose = (_: any | Event, reason?: string) => {
     if (reason === "clickaway") return;
     setOpenSnackbar(false);
     setErrorSnackbar(false);
@@ -52,6 +64,7 @@ const LoginForm = () => {
 
   return (
     <>
+      <SimpleBackdrop loaderState={loaderState} setOpen={setLoaderState} />
       <div
         className="flex justify-center items-center min-h-screen bg-cover bg-center"
         style={{ backgroundImage: `url(${backgroundImage})` }}
@@ -147,12 +160,13 @@ const LoginForm = () => {
                 variant="contained"
                 fullWidth
                 type="submit"
+                disabled={loaderState}
                 sx={{
                   backgroundColor: '#881337',
                   '&:hover': { backgroundColor: '#701a30' }
                 }}
               >
-                Login
+                {loaderState ? "Logging In..." : "Login"}
               </Button>
             </div>
 
@@ -184,7 +198,7 @@ const LoginForm = () => {
           </Snackbar>
 
           <Snackbar
-          anchorOrigin={{ horizontal: "center", vertical: "top" }}
+            anchorOrigin={{ horizontal: "center", vertical: "top" }}
             open={errorSnackbar}
             autoHideDuration={2000}
             onClose={handleSnackbarClose}
