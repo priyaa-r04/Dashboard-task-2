@@ -292,16 +292,6 @@ const Tables = () => {
                 </Alert>
             </Snackbar>
 
-            <Snackbar
-                open={openSnackbar}
-                autoHideDuration={3000}
-                onClose={handleCloseSnackbar}
-                anchorOrigin={{ vertical: "top", horizontal: "center" }}
-            >
-                <Alert severity="success" onClose={handleCloseSnackbar}>
-                    {snackbarMessage}
-                </Alert>
-            </Snackbar>
             <Dialog
                 open={confirmDialogOpen}
                 onClose={() => setConfirmDialogOpen(false)}

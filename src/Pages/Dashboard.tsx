@@ -34,6 +34,7 @@ const CustomAppTitle = () => {
     );
 };
 function DemoPageContent({ pathname }: { pathname: string }) {
+    const { currentUser } = useContext(UserContext);
     return (
         <Box
             sx={{
@@ -55,13 +56,7 @@ function DemoPageContent({ pathname }: { pathname: string }) {
                 <div className="h-72 w-full p-6 bg-white rounded-lg shadow-md flex justify-center items-center">
                   <DoughnutChart />
                 </div>
-              </div>
-              
-              
-              
-              
-              
-              
+              </div>         
             )}
             {pathname === "/users" && (
                 <div>
@@ -69,12 +64,26 @@ function DemoPageContent({ pathname }: { pathname: string }) {
                     <Tables />
                 </div>
             )}
+             {pathname === "/profile" && (
+                <Box sx={{ p: 4 }}>
+                    <Typography variant="h5" gutterBottom>Profile</Typography>
+                    <Box sx={{ background: "#fff", p: 3, borderRadius: 2, boxShadow: 1 }}>
+                        <Typography><strong>Name:</strong> {currentUser?.name}</Typography>
+                        <Typography><strong>Email:</strong> {currentUser?.email}</Typography>
+                    </Box>
+                </Box>
+            )}
         </Box>
     );
 }
 const Dashboard = () => {
     const { users } = useContext(UserContext);
     const router = useDemoRouter("/dashboard");
+
+    const handleNavigate = (page: string) => {
+        router.navigate(page); 
+      };
+    
 
     return (
         <AppProvider
@@ -88,7 +97,7 @@ const Dashboard = () => {
             <DashboardLayout
                 slots={{
                     appTitle: CustomAppTitle,
-                    toolbarActions: ToolbarActionsSearch,
+                    toolbarActions: () => <ToolbarActionsSearch onNavigate={handleNavigate} />
                 }}
             >
                 <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>

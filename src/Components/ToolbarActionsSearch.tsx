@@ -1,23 +1,25 @@
 import { Logout, Settings } from "@mui/icons-material";
 import { Avatar, IconButton, ListItemIcon, Menu, MenuItem, Stack, Tooltip } from "@mui/material";
 import { ThemeSwitcher } from "@toolpad/core";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../ContextAPI/UserContext";
-import { useNavigate } from "react-router-dom";
 
-const ToolbarActionsSearch = () => {
-    const { users } = useContext(UserContext);
+interface ToolbarActionsSearchProps {
+    onNavigate: (page: string) => void; 
+  }
+  
+  const ToolbarActionsSearch = ({ onNavigate }: ToolbarActionsSearchProps) => {
+    const { currentUser, setCurrentUser } = useContext(UserContext);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
-    const navigate = useNavigate();
-
-    const currentUser = users[0];
 
     const userInitial = currentUser?.name.charAt(0).toUpperCase();
 
 
     const handleLogout = () => {
-        navigate("/login");
+        setCurrentUser(null);
+        localStorage.removeItem('currentUser'); 
+        onNavigate("/login");
     };
 
     const handleClick = (event: any) => {
@@ -27,6 +29,16 @@ const ToolbarActionsSearch = () => {
     const handleClose = () => {
         setAnchorEl(null);
     };
+
+    const handleProfileClick = () => {
+        onNavigate("profile");
+        handleClose();
+    };
+
+    useEffect(() => {
+        
+    }, [currentUser]);
+
 
     return (
         <Stack direction="row" alignItems="center" spacing={2}>
@@ -85,7 +97,7 @@ const ToolbarActionsSearch = () => {
                 transformOrigin={{ horizontal: "right", vertical: "top" }}
                 anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
             >
-                <MenuItem onClick={handleClose}>
+                 <MenuItem onClick={handleProfileClick}>
                     <Avatar /> Profile
                 </MenuItem>
                 <MenuItem onClick={handleClose}>
@@ -102,6 +114,7 @@ const ToolbarActionsSearch = () => {
                 </MenuItem>
             </Menu>
         </Stack>
+
     );
 };
 
