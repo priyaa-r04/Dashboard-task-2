@@ -62,7 +62,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       active: false, 
     };
 
-    const updatedUsers= [...users,user]
+    const updatedUsers= [...users,newUser]
     localStorage.setItem("users", JSON.stringify(updatedUsers));
     setUsers(updatedUsers);
     console.log("User added:", newUser); 

@@ -8,6 +8,7 @@ import Tables from './Components/Tables';
 import ProfilePage from './Components/ProfilePage';
 import ToolbarActionsSearch from './Components/ToolbarActionsSearch';
 import { useState } from 'react';
+import PrivateRoute from './Components/PrivateRoute';
 
 const App = () => {
   const [activePage, setActivePage] = useState("dashboard");
@@ -19,7 +20,7 @@ const App = () => {
             <Route path="/" element={<Navigate to="/login" />} />
             <Route path="/login" element={<LoginForm />} />
             <Route path="/signup" element={<SignUp />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
             <Route path="/tables" element={<Tables />} />
           </Routes>
 
