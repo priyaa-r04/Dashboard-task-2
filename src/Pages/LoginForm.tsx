@@ -1,4 +1,4 @@
-import { useState, useContext , useEffect} from "react";
+import { useState, useContext, useEffect } from "react";
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
 import TextField from '@mui/material/TextField';
@@ -8,8 +8,7 @@ import Alert from '@mui/material/Alert';
 import * as Yup from 'yup';
 import { UserContext } from "../ContextAPI/UserContext";
 import backgroundImage from '../assets/bg-signup.jpg'
-import { Checkbox, FormControlLabel } from "@mui/material";
-import SimpleBackdrop from "./Loader"
+import { Checkbox, CircularProgress, FormControlLabel } from "@mui/material";
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Email is Required'),
@@ -40,11 +39,11 @@ const LoginForm = () => {
 
           localStorage.setItem("userData", JSON.stringify(values));
 
-          setTimeout(() => navigate("/dashboard"), 2000);
+          setTimeout(() => navigate("/dashboard"), 1000);
         } else {
           setErrorSnackbar(true);
         }
-      }, 2000);
+      }, 1000);
     },
   });
 
@@ -52,7 +51,7 @@ const LoginForm = () => {
     const savedUser = JSON.parse(localStorage.getItem("userData") || '{}');
 
     if (savedUser && savedUser.email) {
-      formik.setValues(savedUser); 
+      formik.setValues(savedUser);
     }
   }, []);
 
@@ -64,7 +63,6 @@ const LoginForm = () => {
 
   return (
     <>
-      <SimpleBackdrop loaderState={loaderState} setOpen={setLoaderState} />
       <div
         className="flex justify-center items-center min-h-screen bg-cover bg-center"
         style={{ backgroundImage: `url(${backgroundImage})` }}
@@ -166,7 +164,11 @@ const LoginForm = () => {
                   '&:hover': { backgroundColor: '#701a30' }
                 }}
               >
-                {loaderState ? "Logging In..." : "Login"}
+                {loaderState ? (
+                  <CircularProgress size={24} sx={{ color: 'white' }} />
+                ) : (
+                  "Login"
+                )}
               </Button>
             </div>
 
@@ -189,7 +191,7 @@ const LoginForm = () => {
           <Snackbar
             anchorOrigin={{ horizontal: "center", vertical: "top" }}
             open={openSnackbar}
-            autoHideDuration={2000}
+            autoHideDuration={1000}
             onClose={handleSnackbarClose}
           >
             <Alert severity="success" sx={{ width: "100%" }}>
@@ -200,7 +202,7 @@ const LoginForm = () => {
           <Snackbar
             anchorOrigin={{ horizontal: "center", vertical: "top" }}
             open={errorSnackbar}
-            autoHideDuration={2000}
+            autoHideDuration={1000}
             onClose={handleSnackbarClose}
           >
             <Alert severity="error" sx={{ width: "100%" }}>

@@ -3,23 +3,28 @@ import { Avatar, IconButton, ListItemIcon, Menu, MenuItem, Stack, Tooltip } from
 import { ThemeSwitcher } from "@toolpad/core";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../ContextAPI/UserContext";
+import { useNavigate } from "react-router-dom";
 
 interface ToolbarActionsSearchProps {
-    onNavigate: (page: string) => void; 
-  }
-  
-  const ToolbarActionsSearch = ({ onNavigate }: ToolbarActionsSearchProps) => {
-    const { currentUser, setCurrentUser } = useContext(UserContext);
+    onNavigate: (page: string) => void;
+}
+
+const ToolbarActionsSearch = ({ onNavigate }: ToolbarActionsSearchProps) => {
+    const { currentUser, setCurrentUser, users, setUsers } = useContext(UserContext);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
-
     const userInitial = currentUser?.name.charAt(0).toUpperCase();
+
+    const navigate = useNavigate();
 
 
     const handleLogout = () => {
         setCurrentUser(null);
-        localStorage.removeItem('currentUser'); 
-        onNavigate("/login");
+        localStorage.removeItem("currentUser");
+        const updatedUsers = users.filter((user) => user.email !== currentUser?.email);
+        localStorage.setItem("users", JSON.stringify(updatedUsers));
+        setUsers(updatedUsers);
+        navigate("/login");
     };
 
     const handleClick = (event: any) => {
@@ -36,7 +41,7 @@ interface ToolbarActionsSearchProps {
     };
 
     useEffect(() => {
-        
+
     }, [currentUser]);
 
 
@@ -56,7 +61,7 @@ interface ToolbarActionsSearchProps {
             </Tooltip>
             <ThemeSwitcher />
             <IconButton onClick={handleClick}>
-            <Avatar sx={{ bgcolor: "primary.main" }}>
+                <Avatar sx={{ bgcolor: "primary.main" }}>
                     {userInitial}
                 </Avatar>
             </IconButton>
@@ -97,7 +102,7 @@ interface ToolbarActionsSearchProps {
                 transformOrigin={{ horizontal: "right", vertical: "top" }}
                 anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
             >
-                 <MenuItem onClick={handleProfileClick}>
+                <MenuItem onClick={handleProfileClick}>
                     <Avatar /> Profile
                 </MenuItem>
                 <MenuItem onClick={handleClose}>

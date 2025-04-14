@@ -5,10 +5,10 @@ import Button from '@mui/material/Button';
 import backgroundImage from '../assets/bg-signup.jpg';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
-import { UserContext } from "../ContextAPI/UserContext";
+import { User, UserContext } from "../ContextAPI/UserContext";
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert'
-import SimpleBackdrop from "./Loader";
+import CircularProgress from '@mui/material/CircularProgress';
 
 const SignupSchema = Yup.object().shape({
     name: Yup
@@ -28,7 +28,8 @@ const SignUp = () => {
     const { addUser } = useContext(UserContext)!;
     const [loaderState, setLoaderState] = useState(false);
     const [open, setOpen] = useState(false);
-
+    const [error, setError] = useState(false);
+    const [emailExists, setEmailExists] = useState(false);
     const navigate = useNavigate();
 
     const formik = useFormik({
@@ -39,13 +40,42 @@ const SignUp = () => {
         },
         validationSchema: SignupSchema,
         onSubmit: (values) => {
-            console.log(values);
             setLoaderState(true);
-            console.log(values);
+           
+            const userData: User = {
+                ...values,
+                createdDate: new Date().toISOString(), 
+                active: true, 
+            };
+    
+            let usersFromStorage: User[] = [];
+        try {
+            const storedUsers = localStorage.getItem("users");
+            if (storedUsers) {
+                usersFromStorage = JSON.parse(storedUsers);
+            }
+        } catch (e) {
+            console.error("Error reading from localStorage:", e);
+        }
 
-            localStorage.setItem('userData', JSON.stringify(values));
+        const isEmailAlreadyExist = usersFromStorage.some((existingUser) => existingUser.email === userData.email);
+        
+        if (isEmailAlreadyExist) {
+            setLoaderState(false);
+            setError(true);
+            setOpen(true); 
+            return; 
+        }
 
-            addUser(values);
+        try {
+            usersFromStorage.push(userData);
+            localStorage.setItem("users", JSON.stringify(usersFromStorage));
+            console.log("User data added via addUser");
+
+            addUser(userData);
+        } catch (error) {
+            console.error("Error adding user:", error);
+        }
 
             setTimeout(() => {
                 setLoaderState(false);
@@ -53,8 +83,8 @@ const SignUp = () => {
 
                 setTimeout(() => {
                     navigate("/login");
-                }, 2000);
-            }, 2000);
+                }, 1000);
+            }, 1000);
         },
 
 
@@ -65,10 +95,28 @@ const SignUp = () => {
         setOpen(false);
     };
 
+    const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        formik.handleChange(event);
+        const email = event.target.value;
+
+        // Check if the email exists in localStorage
+        let usersFromStorage: User[] = [];
+        try {
+            const storedUsers = localStorage.getItem("users");
+            if (storedUsers) {
+                usersFromStorage = JSON.parse(storedUsers);
+            }
+        } catch (e) {
+            console.error("Error reading from localStorage:", e);
+        }
+
+        const emailExists = usersFromStorage.some((existingUser) => existingUser.email === email);
+        setEmailExists(emailExists); 
+    };
+
 
     return (
         <>
-            <SimpleBackdrop loaderState={loaderState} setOpen={setLoaderState} />
             <div
                 className="flex justify-center items-center min-h-screen bg-cover bg-center"
                 style={{ backgroundImage: `url(${backgroundImage})` }}
@@ -116,11 +164,15 @@ const SignUp = () => {
                                 name="email"
                                 label="Email"
                                 value={formik.values.email}
-                                onChange={formik.handleChange}
+                                onChange={handleEmailChange}
                                 onBlur={formik.handleBlur}
                                 className="w-full"
-                                error={formik.touched.email && Boolean(formik.errors.email)}
-                                helperText={formik.touched.email && formik.errors.email}
+                                error={emailExists || (formik.touched.email && Boolean(formik.errors.email))}
+                                helperText={
+                                    emailExists
+                                        ? 'Email already exists!'
+                                        : formik.touched.email && formik.errors.email
+                                }
 
                                 sx={{   
                                     '& .MuiInputLabel-root.Mui-focused': {
@@ -177,10 +229,14 @@ const SignUp = () => {
                                 variant="contained"
                                 fullWidth
                                 type="submit"
-                                disabled={loaderState}
+                                disabled={loaderState || emailExists}
                                 sx={{ backgroundColor: '#881337', '&:hover': { backgroundColor: '#701a30' } }}
                             >
-                                {loaderState ? "Signing Up..." : "Sign Up"}
+                               {loaderState ? (
+                                    <CircularProgress size={24} sx={{ color: 'white' }} />
+                                ) : (
+                                    "Sign Up"
+                                )}
                             </Button>
                         </div>
                     </form>
@@ -201,11 +257,11 @@ const SignUp = () => {
                     <Snackbar
                         anchorOrigin={{ horizontal: "center", vertical: "top" }}
                         open={open}
-                        autoHideDuration={2000}
-                        onClose={handleClose}>
-
-                        <Alert severity="success" sx={{ width: '100%' }}>
-                            User successfully registered!
+                        autoHideDuration={1000}
+                        onClose={handleClose}
+                    >
+                        <Alert severity={error ? 'error' : 'success'} sx={{ width: '100%' }}>
+                            {error ? 'Email already exists!' : 'User successfully registered!'}
                         </Alert>
                     </Snackbar>
 

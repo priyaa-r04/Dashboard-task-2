@@ -25,11 +25,7 @@ const App = () => {
 
           <ToolbarActionsSearch onNavigate={setActivePage} />
 
-          {activePage === "profile" ? (
-            <ProfilePage /> 
-          ) : (
-            <Dashboard /> 
-          )}
+          {activePage === "profile" && <ProfilePage />}
         </Router>
       </UserProvider>
     </>

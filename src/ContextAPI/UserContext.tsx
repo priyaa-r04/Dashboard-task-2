@@ -1,9 +1,11 @@
-import { createContext, useState, ReactNode } from "react";
+import { createContext, useState, ReactNode, } from "react";
 
 export type User = {
   name: string;
   email: string;
   password: string;
+  createdDate: string; 
+  active: boolean;
 };
 
 type UserContextType = {
@@ -13,6 +15,8 @@ type UserContextType = {
   deleteUser: (email: string) => void;
   checkCredentials: (email: string, password: string) => boolean;
   setCurrentUser: (user: User | null) => void;
+  setUsers: (users: User[]) => void;
+  toggleActive: (email: string, isActive: boolean) => void;
 };
 
 export const UserContext = createContext<UserContextType>({
@@ -22,14 +26,21 @@ export const UserContext = createContext<UserContextType>({
   deleteUser: () => {},
   checkCredentials: () => false,
   setCurrentUser: () => {},
+  setUsers: () => {}, 
+  toggleActive: () => {},
 });
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-  
   const [users, setUsers] = useState<User[]>(() => {
     try {
       const storedUsers = localStorage.getItem("users");
-      return storedUsers ? JSON.parse(storedUsers) : [];
+      return storedUsers
+        ? JSON.parse(storedUsers).map((user: User) => ({
+            ...user,
+            createdDate: user.createdDate || new Date().toISOString(),
+            active: user.active !== undefined ? user.active : false,
+          }))
+        : [];
     } catch (e) {
       console.error("Error reading from localStorage:", e);
       return [];
@@ -44,10 +55,17 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       console.log("Add user failed: Email already exists");
       return false; 
     }
+
+    const newUser = {
+      ...user,
+      createdDate: new Date().toISOString(), 
+      active: false, 
+    };
+
     const updatedUsers= [...users,user]
     localStorage.setItem("users", JSON.stringify(updatedUsers));
     setUsers(updatedUsers);
-    console.log("User added:", user); 
+    console.log("User added:", newUser); 
     return true; 
   };
 
@@ -67,10 +85,30 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     return false;
   };
 
+  const toggleActive = (email: string, isActive: boolean) => {
+    const updatedUsers = users.map((user) =>
+      user.email === email ? { ...user, active: !isActive } : user
+    );
+
+    localStorage.setItem("users", JSON.stringify(updatedUsers));
+    setUsers(updatedUsers);
+  };
+
   return (
-    <UserContext.Provider value={{ users,currentUser, addUser, deleteUser, checkCredentials, setCurrentUser}}>
-    {children}
-  </UserContext.Provider>
+    <UserContext.Provider
+      value={{
+        users,
+        currentUser,
+        addUser,
+        deleteUser,
+        checkCredentials,
+        setCurrentUser,
+        setUsers,
+        toggleActive,
+      }}
+    >
+      {children}
+    </UserContext.Provider>
   );
 };
 

@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import {
     Table,
     TableBody,
@@ -20,12 +20,13 @@ import {
     DialogContent,
     DialogActions,
     Checkbox,
+    Switch,
 } from "@mui/material";
-import { Visibility, Delete, ArrowUpward, ArrowDownward, Search } from "@mui/icons-material";
+import { Visibility, Delete, ArrowUpward, ArrowDownward, Search, Close } from "@mui/icons-material";
 import { UserContext, User } from "../ContextAPI/UserContext";
 
 const Tables = () => {
-    const { users, deleteUser } = useContext(UserContext);
+    const { users, deleteUser, addUser, toggleActive} = useContext(UserContext);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [selectedUserEmails, setSelectedUserEmails] = useState<string[]>([]);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -43,6 +44,8 @@ const Tables = () => {
         name: "",
         email: "",
         password: "",
+        createdDate: new Date().toISOString(),
+        active: false,
     });
 
     const [localUsers, setLocalUsers] = useState<User[]>([...users]);
@@ -99,18 +102,32 @@ const Tables = () => {
         user.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    useEffect(() => {
+        setLocalUsers([...users]);
+    }, [users]);
 
     const paginatedUsers = [...filteredUsers]
-    .sort((a, b) => (sortAscending ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)))
-    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+        .sort((a, b) => (sortAscending ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)))
+        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
-        const handleAddUser = () => {
-            setLocalUsers((prevUsers) => [...prevUsers, newUser]);
-            setNewUser({ name: "", email: "", password: "" });
-            setOpenAddUserDialog(false);
+    const handleAddUser = () => {
+        const userAdded = addUser(newUser);
+        if (userAdded) {
             setSnackbarMessage("User added successfully!");
             setOpenSnackbar(true);
-        };
+        } else {
+            setSnackbarMessage("User already exists.");
+            setOpenSnackbar(true);
+        }
+        setNewUser({
+            name: "",
+            email: "",
+            password: "",
+            createdDate: new Date().toISOString(),
+            active: false,
+        });
+        setOpenAddUserDialog(false);
+    };
 
     return (
         <Box p={3}>
@@ -170,6 +187,8 @@ const Tables = () => {
                             </TableCell>
                             <TableCell>Email</TableCell>
                             <TableCell>Password</TableCell>
+                            <TableCell>Created Date</TableCell>
+                            <TableCell>Active</TableCell>
                             <TableCell>Actions</TableCell>
                         </TableRow>
                     </TableHead>
@@ -187,6 +206,14 @@ const Tables = () => {
                                 <TableCell>{user.name}</TableCell>
                                 <TableCell>{user.email}</TableCell>
                                 <TableCell>{user.password}</TableCell>
+                                <TableCell>{new Date(user.createdDate).toLocaleDateString()}</TableCell>
+                                <TableCell>
+                                    <Switch
+                                        checked={user.active}
+                                        onChange={() => toggleActive(user.email, user.active)}
+                                        color="primary"
+                                    />
+                                </TableCell>
                                 <TableCell>
                                     <IconButton
                                         onClick={() => handleOpenModal(user)}
@@ -263,10 +290,28 @@ const Tables = () => {
                         p: 4,
                         borderRadius: 2,
                         boxShadow: 24,
-                        width: 400,
-                        height: 200,
+                        width: 600,
+                        height: 300,
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+
                     }}
                 >
+
+                    <IconButton
+                        onClick={handleCloseModal}
+                        sx={{
+                            position: "absolute",
+                            top: 8,
+                            right: 8,
+                            color: "gray",
+                            "&:hover": { backgroundColor: "transparent" },
+                        }}
+                    >
+                        <Close />
+                    </IconButton>
 
                     <Typography
                         variant="h5"
@@ -277,6 +322,8 @@ const Tables = () => {
 
                     <Typography>Name: {selectedUser?.name}</Typography>
                     <Typography>Email: {selectedUser?.email}</Typography>
+                    <Typography>Created Date: {new Date(selectedUser?.createdDate!).toLocaleDateString()}</Typography>
+          <Typography>Active: {selectedUser?.active ? "Yes" : "No"}</Typography>
                     <Typography>Password: {selectedUser?.password}</Typography>
 
                 </Box>
