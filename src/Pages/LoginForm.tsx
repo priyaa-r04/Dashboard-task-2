@@ -9,6 +9,10 @@ import * as Yup from 'yup';
 import { UserContext } from "../ContextAPI/UserContext";
 import backgroundImage from '../assets/bg-signup.jpg'
 import { Checkbox, CircularProgress, FormControlLabel } from "@mui/material";
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Email is Required'),
@@ -22,6 +26,9 @@ const LoginForm = () => {
   const [errorSnackbar, setErrorSnackbar] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [loaderState, setLoaderState] = useState(false);
+
+  const [showPassword, setShowPassword] = useState(false);
+  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
   const formik = useFormik({
     initialValues: {
@@ -107,14 +114,13 @@ const LoginForm = () => {
                 id="password"
                 name="password"
                 label="Password"
-                type={"password"}
+                type={showPassword ? 'text' : 'password'}
                 placeholder="Enter your Password"
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 className="w-full"
                 error={formik.touched.password && Boolean(formik.errors.password)}
                 helperText={formik.touched.password && formik.errors.password}
-
                 sx={{
                   '& .MuiInputLabel-root.Mui-focused': {
                     color: '#881337',
@@ -130,6 +136,15 @@ const LoginForm = () => {
                       borderColor: '#701a30',
                     },
                   },
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={togglePasswordVisibility} edge="end">
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
                 }}
               />
             </div>

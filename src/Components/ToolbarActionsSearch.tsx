@@ -1,4 +1,4 @@
-import { Logout, Settings } from "@mui/icons-material";
+import { Logout } from "@mui/icons-material";
 import { Avatar, IconButton, ListItemIcon, Menu, MenuItem, Stack, Tooltip } from "@mui/material";
 import { ThemeSwitcher } from "@toolpad/core";
 import { useContext, useEffect, useState } from "react";
@@ -10,20 +10,18 @@ interface ToolbarActionsSearchProps {
 }
 
 const ToolbarActionsSearch = ({ onNavigate }: ToolbarActionsSearchProps) => {
-    const { currentUser, setCurrentUser, users, setUsers } = useContext(UserContext);
+    const { currentUser, setCurrentUser} = useContext(UserContext);
+
+    if (!currentUser) return null;
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const userInitial = currentUser?.name.charAt(0).toUpperCase();
 
     const navigate = useNavigate();
 
-
     const handleLogout = () => {
         setCurrentUser(null);
         localStorage.removeItem("currentUser");
-        const updatedUsers = users.filter((user) => user.email !== currentUser?.email);
-        localStorage.setItem("users", JSON.stringify(updatedUsers));
-        setUsers(updatedUsers);
         navigate("/login");
     };
 
@@ -36,6 +34,7 @@ const ToolbarActionsSearch = ({ onNavigate }: ToolbarActionsSearchProps) => {
     };
 
     const handleProfileClick = () => {
+        debugger
         onNavigate("profile");
         handleClose();
     };
@@ -78,6 +77,9 @@ const ToolbarActionsSearch = ({ onNavigate }: ToolbarActionsSearchProps) => {
                             overflow: "visible",
                             filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
                             mt: 1.5,
+                            minWidth: 200,  
+                            padding: '16px',  
+                            height: 'auto',  
                             "& .MuiAvatar-root": {
                                 width: 32,
                                 height: 32,
@@ -104,12 +106,6 @@ const ToolbarActionsSearch = ({ onNavigate }: ToolbarActionsSearchProps) => {
             >
                 <MenuItem onClick={handleProfileClick}>
                     <Avatar /> Profile
-                </MenuItem>
-                <MenuItem onClick={handleClose}>
-                    <ListItemIcon>
-                        <Settings fontSize="small" />
-                    </ListItemIcon>
-                    Settings
                 </MenuItem>
                 <MenuItem onClick={handleLogout}>
                     <ListItemIcon>

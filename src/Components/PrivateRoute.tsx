@@ -9,8 +9,8 @@ const PrivateRoute = ({ children }: { children: ReactNode }) => {
   if (!currentUser) {
     return <Navigate to="/login" />;
   }
-
-  return <>{children}</>;
+  
+  return children;
 };
 
 export default PrivateRoute;

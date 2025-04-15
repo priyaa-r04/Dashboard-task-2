@@ -5,11 +5,14 @@ import { useContext } from "react";
 import { UserContext } from "../ContextAPI/UserContext";
 import { useDemoRouter } from "@toolpad/core/internal";
 import ToolbarActionsSearch from "../Components/ToolbarActionsSearch";
-import Tables from "../Components/Tables";
-import { BarChart } from '../Components/BarChart';
-import {LineChart} from "../Components/LineChart"
-import { RadarChart } from "../Components/RadarChart";
-import { DoughnutChart } from "../Components/DoughnutChart";
+import Tables from "../Components/Tables/Tables";
+import { BarChart } from '../Components/Graphs/BarChart';
+import {LineChart} from "../Components/Graphs/LineChart"
+import { RadarChart } from "../Components/Graphs/RadarChart";
+import { DoughnutChart } from "../Components/Graphs/DoughnutChart";
+import ProfilePage from "../Components/ProfilePage";
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import PeopleIcon from '@mui/icons-material/People';
 
 const demoTheme = createTheme({
     cssVariables: {
@@ -33,8 +36,7 @@ const CustomAppTitle = () => {
         </Box>
     );
 };
-function DemoPageContent({ pathname }: { pathname: string }) {
-    const { currentUser } = useContext(UserContext);
+function DemoPageContent({ pathname, navigate }: { pathname: string; navigate: (segment: string) => void }) {
     return (
         <Box
             sx={{
@@ -64,15 +66,7 @@ function DemoPageContent({ pathname }: { pathname: string }) {
                     <Tables />
                 </div>
             )}
-             {pathname === "/profile" && (
-                <Box sx={{ p: 4 }}>
-                    <Typography variant="h5" gutterBottom>Profile</Typography>
-                    <Box sx={{ background: "#fff", p: 3, borderRadius: 2, boxShadow: 1 }}>
-                        <Typography><strong>Name:</strong> {currentUser?.name}</Typography>
-                        <Typography><strong>Email:</strong> {currentUser?.email}</Typography>
-                    </Box>
-                </Box>
-            )}
+             {pathname === "/profile" && <ProfilePage onClose={() => navigate("dashboard")} />}
         </Box>
     );
 }
@@ -88,8 +82,8 @@ const Dashboard = () => {
     return (
         <AppProvider
             navigation={[
-                { segment: "dashboard", title: "Dashboard" },
-                { segment: "users", title: "Users" },
+                { segment: "dashboard", title: "Dashboard" , icon: <DashboardIcon />},
+                { segment: "users", title: "Users" , icon: <PeopleIcon /> },
             ]}
             router={router}
             theme={demoTheme}
@@ -101,15 +95,15 @@ const Dashboard = () => {
                 }}
             >
                 <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-                    <DemoPageContent pathname={router.pathname} />
-                    {router.pathname === "/users" && (
-                        <Box sx={{ p: 2, mt: "auto" }}>
-                            <Typography variant="h6" textAlign="center">
-                                Total Users: {users?.length || 0}
-                            </Typography>
-                        </Box>
-                    )}
-                </Box>
+          <DemoPageContent pathname={router.pathname} navigate={handleNavigate} />
+          {router.pathname === "/users" && (
+            <Box sx={{ p: 2, mt: "auto" }}>
+              <Typography variant="h6" textAlign="center">
+                Total Users: {users?.length || 0}
+              </Typography>
+            </Box>
+          )}
+        </Box>
 
             </DashboardLayout>
         </AppProvider>

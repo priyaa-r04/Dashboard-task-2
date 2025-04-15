@@ -1,4 +1,4 @@
-import { createContext, useState, ReactNode, } from "react";
+import { createContext, useState, useEffect, ReactNode, } from "react";
 
 export type User = {
   name: string;
@@ -46,7 +46,23 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       return [];
     }
   });
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+  const [currentUser, setCurrentUser] = useState<User | null>(() => {
+    try {
+      const storedUser = localStorage.getItem("currentUser");
+      return storedUser ? JSON.parse(storedUser) : null;
+    } catch (e) {
+      return null;
+    }
+  });
+
+  useEffect(() => {
+    if (currentUser) {
+      localStorage.setItem("currentUser", JSON.stringify(currentUser));
+    } else {
+      localStorage.removeItem("currentUser");
+    }
+  }, [currentUser]);
   
   const addUser = (user: User): boolean => {
     const emailExists = users.some((existingUser) => existingUser.email === user.email);

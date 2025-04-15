@@ -9,6 +9,11 @@ import { User, UserContext } from "../ContextAPI/UserContext";
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert'
 import CircularProgress from '@mui/material/CircularProgress';
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+
 
 const SignupSchema = Yup.object().shape({
     name: Yup
@@ -32,6 +37,9 @@ const SignUp = () => {
     const [emailExists, setEmailExists] = useState(false);
     const navigate = useNavigate();
 
+    const [showPassword, setShowPassword] = useState(false);
+    const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+
     const formik = useFormik({
         initialValues: {
             name: '',
@@ -41,41 +49,41 @@ const SignUp = () => {
         validationSchema: SignupSchema,
         onSubmit: (values) => {
             setLoaderState(true);
-           
+
             const userData: User = {
                 ...values,
-                createdDate: new Date().toISOString(), 
-                active: true, 
+                createdDate: new Date().toISOString(),
+                active: true,
             };
-    
+
             let usersFromStorage: User[] = [];
-        try {
-            const storedUsers = localStorage.getItem("users");
-            if (storedUsers) {
-                usersFromStorage = JSON.parse(storedUsers);
+            try {
+                const storedUsers = localStorage.getItem("users");
+                if (storedUsers) {
+                    usersFromStorage = JSON.parse(storedUsers);
+                }
+            } catch (e) {
+                console.error("Error reading from localStorage:", e);
             }
-        } catch (e) {
-            console.error("Error reading from localStorage:", e);
-        }
 
-        const isEmailAlreadyExist = usersFromStorage.some((existingUser) => existingUser.email === userData.email);
-        
-        if (isEmailAlreadyExist) {
-            setLoaderState(false);
-            setError(true);
-            setOpen(true); 
-            return; 
-        }
+            const isEmailAlreadyExist = usersFromStorage.some((existingUser) => existingUser.email === userData.email);
 
-        try {
-            usersFromStorage.push(userData);
-            localStorage.setItem("users", JSON.stringify(usersFromStorage));
-            console.log("User data added via addUser");
+            if (isEmailAlreadyExist) {
+                setLoaderState(false);
+                setError(true);
+                setOpen(true);
+                return;
+            }
 
-            addUser(userData);
-        } catch (error) {
-            console.error("Error adding user:", error);
-        }
+            try {
+                usersFromStorage.push(userData);
+                localStorage.setItem("users", JSON.stringify(usersFromStorage));
+                console.log("User data added via addUser");
+
+                addUser(userData);
+            } catch (error) {
+                console.error("Error adding user:", error);
+            }
 
             setTimeout(() => {
                 setLoaderState(false);
@@ -99,7 +107,6 @@ const SignUp = () => {
         formik.handleChange(event);
         const email = event.target.value;
 
-        // Check if the email exists in localStorage
         let usersFromStorage: User[] = [];
         try {
             const storedUsers = localStorage.getItem("users");
@@ -111,7 +118,7 @@ const SignUp = () => {
         }
 
         const emailExists = usersFromStorage.some((existingUser) => existingUser.email === email);
-        setEmailExists(emailExists); 
+        setEmailExists(emailExists);
     };
 
 
@@ -174,7 +181,7 @@ const SignUp = () => {
                                         : formik.touched.email && formik.errors.email
                                 }
 
-                                sx={{   
+                                sx={{
                                     '& .MuiInputLabel-root.Mui-focused': {
                                         color: '#881337',
                                     },
@@ -198,8 +205,8 @@ const SignUp = () => {
                                 id="password"
                                 name="password"
                                 label="Password"
-                                type={'password'}
-                                value={formik.values.password}
+                                type={showPassword ? 'text' : 'password'}
+                                placeholder="Enter your Password"
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
                                 className="w-full"
@@ -221,6 +228,15 @@ const SignUp = () => {
                                         },
                                     },
                                 }}
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton onClick={togglePasswordVisibility} edge="end">
+                                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ),
+                                }}
                             />
                         </div>
                         <div className="mt-4 text-center">
@@ -232,7 +248,7 @@ const SignUp = () => {
                                 disabled={loaderState || emailExists}
                                 sx={{ backgroundColor: '#881337', '&:hover': { backgroundColor: '#701a30' } }}
                             >
-                               {loaderState ? (
+                                {loaderState ? (
                                     <CircularProgress size={24} sx={{ color: 'white' }} />
                                 ) : (
                                     "Sign Up"
