@@ -6,7 +6,7 @@ import {
     TextField,
     Button,
 } from "@mui/material";
-import { User } from "../../ContextAPI/UserContext";
+import { User } from "../ContextAPI/UserContext";
 
 type SetUserState = (value: User | ((prev: User) => User)) => void;
 

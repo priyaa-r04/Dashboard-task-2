@@ -5,7 +5,7 @@ import Button from '@mui/material/Button';
 import backgroundImage from '../assets/bg-signup.jpg';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
-import { User, UserContext } from "../ContextAPI/UserContext";
+import { User, UserContext } from "../Components/ContextAPI/UserContext";
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert'
 import CircularProgress from '@mui/material/CircularProgress';
@@ -20,7 +20,22 @@ const SignupSchema = Yup.object().shape({
         .string()
         .matches(/^[a-zA-Z\s]+$/, 'Name must contain only letters and spaces')
         .required('Name is Required'),
-    email: Yup.string().email('Invalid email').required('Email is Required'),
+    email: Yup
+    .string()
+    .matches(/^[a-zA-Z0-9._%+-]+@gmail\.com$/, "Email must be a valid Gmail address.")
+    .email('Invalid email')
+    .required('Email is Required')
+    .test('email-exists', 'Email already exists!', function (value) {
+        if (!value) return true;
+        try {
+            const storedUsers = localStorage.getItem("users");
+            const users: User[] = storedUsers ? JSON.parse(storedUsers) : [];
+            return !users.some((user) => user.email === value);
+        } catch (e) {
+            console.error("Yup email test error:", e);
+            return true;
+        }
+    }),
     password: Yup
         .string()
         .min(6, 'Password length must be 6')
@@ -33,11 +48,9 @@ const SignUp = () => {
     const { addUser } = useContext(UserContext)!;
     const [loaderState, setLoaderState] = useState(false);
     const [open, setOpen] = useState(false);
-    const [error, setError] = useState(false);
-    const [emailExists, setEmailExists] = useState(false);
     const navigate = useNavigate();
-
     const [showPassword, setShowPassword] = useState(false);
+    
     const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
     const formik = useFormik({
@@ -56,71 +69,33 @@ const SignUp = () => {
                 active: true,
             };
 
-            let usersFromStorage: User[] = [];
+            // let usersFromStorage: User[] = [];
             try {
                 const storedUsers = localStorage.getItem("users");
-                if (storedUsers) {
-                    usersFromStorage = JSON.parse(storedUsers);
-                }
-            } catch (e) {
-                console.error("Error reading from localStorage:", e);
-            }
+                const usersFromStorage: User[] = storedUsers ? JSON.parse(storedUsers) : [];
 
-            const isEmailAlreadyExist = usersFromStorage.some((existingUser) => existingUser.email === userData.email);
-
-            if (isEmailAlreadyExist) {
-                setLoaderState(false);
-                setError(true);
-                setOpen(true);
-                return;
-            }
-
-            try {
                 usersFromStorage.push(userData);
                 localStorage.setItem("users", JSON.stringify(usersFromStorage));
-                console.log("User data added via addUser");
-
                 addUser(userData);
-            } catch (error) {
-                console.error("Error adding user:", error);
-            }
 
-            setTimeout(() => {
-                setLoaderState(false);
                 setOpen(true);
 
-                setTimeout(() => {
+            setTimeout(() => {
                     navigate("/login");
                 }, 1000);
-            }, 1000);
+            } catch (error) {
+                console.error("Error adding user:", error);
+            } finally {
+                setLoaderState(false);
+            }
         },
 
 
     });
-    const handleClose = (event: any | Event, reason: string) => {
+    const handleClose = (_: any | Event, reason: string) => {
         if (reason === 'clickaway') return;
-        console.log(event);
         setOpen(false);
     };
-
-    const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        formik.handleChange(event);
-        const email = event.target.value;
-
-        let usersFromStorage: User[] = [];
-        try {
-            const storedUsers = localStorage.getItem("users");
-            if (storedUsers) {
-                usersFromStorage = JSON.parse(storedUsers);
-            }
-        } catch (e) {
-            console.error("Error reading from localStorage:", e);
-        }
-
-        const emailExists = usersFromStorage.some((existingUser) => existingUser.email === email);
-        setEmailExists(emailExists);
-    };
-
 
     return (
         <>
@@ -171,16 +146,11 @@ const SignUp = () => {
                                 name="email"
                                 label="Email"
                                 value={formik.values.email}
-                                onChange={handleEmailChange}
+                                onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
                                 className="w-full"
-                                error={emailExists || (formik.touched.email && Boolean(formik.errors.email))}
-                                helperText={
-                                    emailExists
-                                        ? 'Email already exists!'
-                                        : formik.touched.email && formik.errors.email
-                                }
-
+                                error={formik.touched.email && Boolean(formik.errors.email)}
+                        helperText={formik.touched.email && formik.errors.email}
                                 sx={{
                                     '& .MuiInputLabel-root.Mui-focused': {
                                         color: '#881337',
@@ -212,6 +182,15 @@ const SignUp = () => {
                                 className="w-full"
                                 error={formik.touched.password && Boolean(formik.errors.password)}
                                 helperText={formik.touched.password && formik.errors.password}
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton onClick={togglePasswordVisibility} edge="end">
+                                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ),
+                                }}
                                 sx={{
                                     '& .MuiInputLabel-root.Mui-focused': {
                                         color: '#881337',
@@ -228,15 +207,7 @@ const SignUp = () => {
                                         },
                                     },
                                 }}
-                                InputProps={{
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <IconButton onClick={togglePasswordVisibility} edge="end">
-                                                {showPassword ? <VisibilityOff /> : <Visibility />}
-                                            </IconButton>
-                                        </InputAdornment>
-                                    ),
-                                }}
+                                
                             />
                         </div>
                         <div className="mt-4 text-center">
@@ -245,7 +216,7 @@ const SignUp = () => {
                                 variant="contained"
                                 fullWidth
                                 type="submit"
-                                disabled={loaderState || emailExists}
+                                disabled={loaderState}
                                 sx={{ backgroundColor: '#881337', '&:hover': { backgroundColor: '#701a30' } }}
                             >
                                 {loaderState ? (
@@ -276,9 +247,9 @@ const SignUp = () => {
                         autoHideDuration={1000}
                         onClose={handleClose}
                     >
-                        <Alert severity={error ? 'error' : 'success'} sx={{ width: '100%' }}>
-                            {error ? 'Email already exists!' : 'User successfully registered!'}
-                        </Alert>
+                        <Alert severity="success" sx={{ width: '100%' }}>
+                        User successfully registered!
+                    </Alert>
                     </Snackbar>
 
                 </div>

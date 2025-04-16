@@ -11,7 +11,7 @@ import {
     TablePagination,
 } from "@mui/material";
 import { Visibility, Delete, ArrowUpward, ArrowDownward } from "@mui/icons-material";
-import { User } from "../../ContextAPI/UserContext";
+import { User } from "../ContextAPI/UserContext";
 
 interface UserListProps {
     users: User[];
@@ -67,7 +67,7 @@ const UserList = ({
                             </Box>
                         </TableCell>
                         <TableCell>Email</TableCell>
-                        <TableCell>Password</TableCell>
+                        {/* <TableCell>Password</TableCell> */}
                         <TableCell>Created Date</TableCell>
                         <TableCell>Active</TableCell>
                         <TableCell>Actions</TableCell>
@@ -84,7 +84,7 @@ const UserList = ({
                             </TableCell>
                             <TableCell>{user.name}</TableCell>
                             <TableCell>{user.email}</TableCell>
-                            <TableCell>{user.password}</TableCell>
+                            {/* <TableCell>{user.password}</TableCell> */}
                             <TableCell>{new Date(user.createdDate).toLocaleDateString()}</TableCell>
                             <TableCell>
                                 <Switch

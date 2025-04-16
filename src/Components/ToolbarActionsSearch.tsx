@@ -2,7 +2,7 @@ import { Logout } from "@mui/icons-material";
 import { Avatar, IconButton, ListItemIcon, Menu, MenuItem, Stack, Tooltip } from "@mui/material";
 import { ThemeSwitcher } from "@toolpad/core";
 import { useContext, useEffect, useState } from "react";
-import { UserContext } from "../ContextAPI/UserContext";
+import { UserContext } from "./ContextAPI/UserContext";
 import { useNavigate } from "react-router-dom";
 
 interface ToolbarActionsSearchProps {

@@ -5,7 +5,7 @@ import {
     IconButton,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
-import { User } from "../../ContextAPI/UserContext";
+import { User } from "../ContextAPI/UserContext";
 
 interface UserModalProps {
     open: boolean;
@@ -55,7 +55,7 @@ const UserModal = ({ open, onClose, selectedUser }: UserModalProps) => {
                 <Typography>Email: {selectedUser?.email}</Typography>
                 <Typography>Created Date: {selectedUser?.createdDate && new Date(selectedUser.createdDate).toLocaleDateString()}</Typography>
                 <Typography>Active: {selectedUser?.active ? "Yes" : "No"}</Typography>
-                <Typography>Password: {maskedPassword}</Typography> {/* Masked Password */}
+                {/* <Typography>Password: {maskedPassword}</Typography>  */}
             </Box>
         </Modal>
     );

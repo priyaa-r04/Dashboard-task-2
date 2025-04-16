@@ -6,7 +6,7 @@ import {
     Button,
     Typography,
 } from "@mui/material";
-import { User } from "../../ContextAPI/UserContext";
+import { User } from "../ContextAPI/UserContext";
 
 interface ConfirmDeleteDialogProps {
     open: boolean;

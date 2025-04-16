@@ -6,6 +6,7 @@ export type User = {
   password: string;
   createdDate: string; 
   active: boolean;
+  profileImageUrl?: string;
 };
 
 type UserContextType = {
@@ -76,6 +77,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       ...user,
       createdDate: new Date().toISOString(), 
       active: false, 
+      profileImageUrl: user.profileImageUrl || "",
     };
 
     const updatedUsers= [...users,newUser]

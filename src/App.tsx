@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import LoginForm from './Pages/LoginForm';
 import SignUp from './Pages/SignUp';
 import Dashboard from "./Pages/Dashboard";
-import { UserProvider } from "./ContextAPI/UserContext";
+import { UserProvider } from "./Components/ContextAPI/UserContext";
 import Tables from './Components/Tables/Tables';
 // import ProfilePage from './Components/ProfilePage';
 import { useEffect, useState } from 'react';

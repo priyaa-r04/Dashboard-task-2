@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import { UserContext } from "../ContextAPI/UserContext";
+import { UserContext } from "./ContextAPI/UserContext";
 import { Box, Button, TextField, Typography, Avatar, Snackbar } from "@mui/material";
 
 interface ProfilePageProps {

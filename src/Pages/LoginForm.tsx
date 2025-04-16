@@ -6,7 +6,7 @@ import Button from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import * as Yup from 'yup';
-import { UserContext } from "../ContextAPI/UserContext";
+import { UserContext } from "../Components/ContextAPI/UserContext";
 import backgroundImage from '../assets/bg-signup.jpg'
 import { Checkbox, CircularProgress, FormControlLabel } from "@mui/material";
 import IconButton from '@mui/material/IconButton';
@@ -44,7 +44,7 @@ const LoginForm = () => {
         if (isValid) {
           setOpenSnackbar(true);
 
-          localStorage.setItem("userData", JSON.stringify(values));
+          // localStorage.setItem("userData", JSON.stringify(values));
 
           setTimeout(() => navigate("/dashboard"), 1000);
         } else {
@@ -54,13 +54,13 @@ const LoginForm = () => {
     },
   });
 
-  useEffect(() => {
-    const savedUser = JSON.parse(localStorage.getItem("userData") || '{}');
+  // useEffect(() => {
+  //   const savedUser = JSON.parse(localStorage.getItem("userData") || '{}');
 
-    if (savedUser && savedUser.email) {
-      formik.setValues(savedUser);
-    }
-  }, []);
+  //   if (savedUser && savedUser.email) {
+  //     formik.setValues(savedUser);
+  //   }
+  // }, []);
 
   const handleSnackbarClose = (_: any | Event, reason?: string) => {
     if (reason === "clickaway") return;

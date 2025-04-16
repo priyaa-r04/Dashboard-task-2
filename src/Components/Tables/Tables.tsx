@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect } from "react";
 import { Box, TextField, Paper, IconButton, Button } from "@mui/material";
 import { Search } from "@mui/icons-material";
-import { UserContext, User } from "../../ContextAPI/UserContext";
+import { UserContext, User } from "../ContextAPI/UserContext";
 import UserList from "./UserList";
 import UserDialog from "./UserDialog";
 import UserModal from "./UserModal";
