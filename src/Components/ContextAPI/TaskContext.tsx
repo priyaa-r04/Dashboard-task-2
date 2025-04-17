@@ -20,7 +20,7 @@ const TaskContext = createContext<TaskContextType>({
 
 export const useTaskContext = () => useContext(TaskContext);
 
-export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export function TaskProvider({ children }: { children: React.ReactNode }) {
   const [tasks, setTasks] = useState<Task[]>(() => {
     try {
       const storedTasks = localStorage.getItem("tasks");
@@ -32,7 +32,6 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   useEffect(() => {
-    // Save tasks to localStorage whenever they change
     if (tasks.length > 0) {
       localStorage.setItem("tasks", JSON.stringify(tasks));
     }

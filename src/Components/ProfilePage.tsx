@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, ChangeEvent } from "react";
 import { UserContext } from "./ContextAPI/UserContext";
 import {
   Box,
@@ -23,8 +23,7 @@ const ProfilePage = ({ onClose }: ProfilePageProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [profileImage, setProfileImage] = useState<File | null>(null);
-  const [imageInputVisible, setImageInputVisible] = useState(false); // State to show the image input field
+  const [imageInputVisible, setImageInputVisible] = useState(false); 
 
   const handlePasswordChange = () => {
     if (currentPassword && newPassword) {
@@ -55,7 +54,7 @@ const ProfilePage = ({ onClose }: ProfilePageProps) => {
     }
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && currentUser) {
       const imageUrl = URL.createObjectURL(file);
@@ -69,14 +68,13 @@ const ProfilePage = ({ onClose }: ProfilePageProps) => {
         user.email === currentUser.email ? updatedUser : user
       );
 
-      setProfileImage(file);
       setCurrentUser(updatedUser);
       setUsers(updatedUsers);
       localStorage.setItem("currentUser", JSON.stringify(updatedUser));
       localStorage.setItem("users", JSON.stringify(updatedUsers));
       setSnackbarMessage("Profile image updated successfully");
       setSnackbarOpen(true);
-      setImageInputVisible(false); // Hide the image input after upload
+      setImageInputVisible(false); 
     }
   };
 
@@ -112,12 +110,11 @@ const ProfilePage = ({ onClose }: ProfilePageProps) => {
 
           {isEditing && (
             <>
-              {/* Show Edit Image button, and when clicked, show the file input */}
               {!imageInputVisible && (
                 <Button
                   variant="outlined"
                   color="primary"
-                  onClick={() => setImageInputVisible(true)} // Show image input when clicked
+                  onClick={() => setImageInputVisible(true)} 
                   sx={{ mb: 2 }}
                 >
                   Edit Image

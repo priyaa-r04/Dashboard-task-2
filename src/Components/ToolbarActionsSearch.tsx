@@ -16,8 +16,6 @@ const ToolbarActionsSearch = ({ onNavigate }: ToolbarActionsSearchProps) => {
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
-    const userInitial = currentUser?.name.charAt(0).toUpperCase();
-
     const navigate = useNavigate();
 
     const handleLogout = () => {
@@ -57,10 +55,9 @@ const ToolbarActionsSearch = ({ onNavigate }: ToolbarActionsSearchProps) => {
             <IconButton onClick={handleClick}>
                 <Avatar 
                     sx={{ bgcolor: "primary.main" }}
-                    src={currentUser?.profileImageUrl || undefined} // Check if profileImageUrl exists
+                    src={currentUser?.profileImageUrl || undefined} 
                 >
-                    {/* If no profileImageUrl, show the user's initial */}
-                    {!currentUser?.profileImageUrl && userInitial}
+                    {currentUser?.profileImageUrl || currentUser?.name.charAt(0).toUpperCase()}
                 </Avatar>
             </IconButton>
             <Menu

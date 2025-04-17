@@ -69,7 +69,6 @@ const SignUp = () => {
                 active: true,
             };
 
-            // let usersFromStorage: User[] = [];
             try {
                 const storedUsers = localStorage.getItem("users");
                 const usersFromStorage: User[] = storedUsers ? JSON.parse(storedUsers) : [];

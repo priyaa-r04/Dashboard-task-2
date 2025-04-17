@@ -14,7 +14,6 @@ interface UserModalProps {
 }
 
 const UserModal = ({ open, onClose, selectedUser }: UserModalProps) => {
-    const maskedPassword = selectedUser?.password ? '*'.repeat(selectedUser.password.length) : '';
 
     return (
         <Modal open={open} onClose={onClose}>
@@ -55,7 +54,6 @@ const UserModal = ({ open, onClose, selectedUser }: UserModalProps) => {
                 <Typography>Email: {selectedUser?.email}</Typography>
                 <Typography>Created Date: {selectedUser?.createdDate && new Date(selectedUser.createdDate).toLocaleDateString()}</Typography>
                 <Typography>Active: {selectedUser?.active ? "Yes" : "No"}</Typography>
-                {/* <Typography>Password: {maskedPassword}</Typography>  */}
             </Box>
         </Modal>
     );

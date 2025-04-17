@@ -16,10 +16,8 @@ const TaskList = () => {
 
     const getUser = (email: string) => users.find((user) => user.email === email);
 
-    // Filtering tasks based on the assigned user and search term
     const filteredTasks = tasks.filter((task) => {
         const user = getUser(task.assignedTo);
-        // Check if the user's name matches the search term (case-insensitive)
         return (
             task.assignedTo === currentUser?.email &&
             (user?.name.toLowerCase().includes(searchTerm.toLowerCase()))

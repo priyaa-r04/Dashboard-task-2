@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useState ,type ChangeEvent,} from 'react';
 import {
     TextField,
     MenuItem,
@@ -29,7 +29,7 @@ const AssignTask = () => {
         description: '',
     });
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setTask((prev) => ({ ...prev, [name]: value }));
     };
@@ -64,14 +64,14 @@ const AssignTask = () => {
                     label="Assign To"
                     onChange={handleAssignChange}
                     sx={{
-                        width: '100%', // Ensure Select takes full width
+                        width: '100%',
                     }}
                     MenuProps={{
                         PaperProps: {
                             style: {
-                                width: 'auto', // Adjust width to fit the content
-                                minWidth: '250px', // Increased minWidth for wider dropdown
-                                maxWidth: '350px', // Increased maxWidth to give more room for longer names
+                                width: 'auto', 
+                                minWidth: '250px', 
+                                maxWidth: '350px', 
                             },
                         },
                     }}

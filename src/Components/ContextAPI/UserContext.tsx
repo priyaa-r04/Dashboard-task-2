@@ -18,6 +18,7 @@ type UserContextType = {
   setCurrentUser: (user: User | null) => void;
   setUsers: (users: User[]) => void;
   toggleActive: (email: string, isActive: boolean) => void;
+  updateProfileImage: (email: string, newImageUrl: string) => void; 
 };
 
 export const UserContext = createContext<UserContextType>({
@@ -29,6 +30,7 @@ export const UserContext = createContext<UserContextType>({
   setCurrentUser: () => {},
   setUsers: () => {}, 
   toggleActive: () => {},
+  updateProfileImage: () => {},
 });
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
@@ -112,6 +114,21 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     setUsers(updatedUsers);
   };
 
+  const updateProfileImage = (email: string, newImageUrl: string) => {
+    const updatedUsers = users.map((user) =>
+      user.email === email ? { ...user, profileImageUrl: newImageUrl } : user
+    );
+
+    localStorage.setItem("users", JSON.stringify(updatedUsers));
+    setUsers(updatedUsers);
+
+    if (currentUser?.email === email) {
+      setCurrentUser({ ...currentUser, profileImageUrl: newImageUrl });
+      localStorage.setItem("currentUser", JSON.stringify({ ...currentUser, profileImageUrl: newImageUrl }));
+    }
+  };
+
+
   return (
     <UserContext.Provider
       value={{
@@ -123,6 +140,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         setCurrentUser,
         setUsers,
         toggleActive,
+        updateProfileImage,
       }}
     >
       {children}
