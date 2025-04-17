@@ -1,7 +1,7 @@
 import { Logout } from "@mui/icons-material";
 import { Avatar, IconButton, ListItemIcon, Menu, MenuItem, Stack, Tooltip } from "@mui/material";
 import { ThemeSwitcher } from "@toolpad/core";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { UserContext } from "./ContextAPI/UserContext";
 import { useNavigate } from "react-router-dom";
 
@@ -10,9 +10,10 @@ interface ToolbarActionsSearchProps {
 }
 
 const ToolbarActionsSearch = ({ onNavigate }: ToolbarActionsSearchProps) => {
-    const { currentUser, setCurrentUser} = useContext(UserContext);
+    const { currentUser, setCurrentUser } = useContext(UserContext);
 
     if (!currentUser) return null;
+
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const userInitial = currentUser?.name.charAt(0).toUpperCase();
@@ -34,15 +35,9 @@ const ToolbarActionsSearch = ({ onNavigate }: ToolbarActionsSearchProps) => {
     };
 
     const handleProfileClick = () => {
-        debugger
         onNavigate("profile");
         handleClose();
     };
-
-    useEffect(() => {
-
-    }, [currentUser]);
-
 
     return (
         <Stack direction="row" alignItems="center" spacing={2}>
@@ -60,8 +55,12 @@ const ToolbarActionsSearch = ({ onNavigate }: ToolbarActionsSearchProps) => {
             </Tooltip>
             <ThemeSwitcher />
             <IconButton onClick={handleClick}>
-                <Avatar sx={{ bgcolor: "primary.main" }}>
-                    {userInitial}
+                <Avatar 
+                    sx={{ bgcolor: "primary.main" }}
+                    src={currentUser?.profileImageUrl || undefined} // Check if profileImageUrl exists
+                >
+                    {/* If no profileImageUrl, show the user's initial */}
+                    {!currentUser?.profileImageUrl && userInitial}
                 </Avatar>
             </IconButton>
             <Menu
@@ -77,9 +76,9 @@ const ToolbarActionsSearch = ({ onNavigate }: ToolbarActionsSearchProps) => {
                             overflow: "visible",
                             filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
                             mt: 1.5,
-                            minWidth: 200,  
-                            padding: '16px',  
-                            height: 'auto',  
+                            minWidth: 200,
+                            padding: '16px',
+                            height: 'auto',
                             "& .MuiAvatar-root": {
                                 width: 32,
                                 height: 32,
@@ -115,7 +114,6 @@ const ToolbarActionsSearch = ({ onNavigate }: ToolbarActionsSearchProps) => {
                 </MenuItem>
             </Menu>
         </Stack>
-
     );
 };
 

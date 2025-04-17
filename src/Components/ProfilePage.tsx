@@ -1,9 +1,16 @@
 import { useState, useContext } from "react";
 import { UserContext } from "./ContextAPI/UserContext";
-import { Box, Button, TextField, Typography, Avatar, Snackbar } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Avatar,
+  Snackbar,
+} from "@mui/material";
 
 interface ProfilePageProps {
-  onClose: () => void;  
+  onClose: () => void;
 }
 
 const ProfilePage = ({ onClose }: ProfilePageProps) => {
@@ -15,17 +22,30 @@ const ProfilePage = ({ onClose }: ProfilePageProps) => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [imageInputVisible, setImageInputVisible] = useState(false); // State to show the image input field
 
   const handlePasswordChange = () => {
     if (currentPassword && newPassword) {
       if (currentPassword === currentUser?.password) {
-        const updatedUser = { ...currentUser!, password: newPassword };
-        setCurrentUser(updatedUser);
+        const updatedUser = {
+          ...currentUser!,
+          password: newPassword,
+          name,
+          email,
+          profileImageUrl: currentUser?.profileImageUrl,
+        };
+
         const updatedUsers = users.map((user) =>
           user.email === currentUser?.email ? updatedUser : user
         );
+
+        setCurrentUser(updatedUser);
         setUsers(updatedUsers);
         localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+        localStorage.setItem("users", JSON.stringify(updatedUsers));
+        setSnackbarMessage("Password updated successfully");
         setSnackbarOpen(true);
       } else {
         alert("Current password is incorrect.");
@@ -35,9 +55,34 @@ const ProfilePage = ({ onClose }: ProfilePageProps) => {
     }
   };
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && currentUser) {
+      const imageUrl = URL.createObjectURL(file);
+
+      const updatedUser = {
+        ...currentUser,
+        profileImageUrl: imageUrl,
+      };
+
+      const updatedUsers = users.map((user) =>
+        user.email === currentUser.email ? updatedUser : user
+      );
+
+      setProfileImage(file);
+      setCurrentUser(updatedUser);
+      setUsers(updatedUsers);
+      localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+      localStorage.setItem("users", JSON.stringify(updatedUsers));
+      setSnackbarMessage("Profile image updated successfully");
+      setSnackbarOpen(true);
+      setImageInputVisible(false); // Hide the image input after upload
+    }
+  };
+
   if (!currentUser) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", p: 6, height: "100vh"}}>
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", p: 6, height: "100vh" }}>
         <Typography variant="h4" gutterBottom>
           No user data found
         </Typography>
@@ -47,25 +92,47 @@ const ProfilePage = ({ onClose }: ProfilePageProps) => {
 
   return (
     <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", mt: 0 }}>
-  <Box sx={{ width: "100%", maxWidth: "800px", p: 6, backgroundColor: "white", boxShadow: 3, borderRadius: 2 }}>
-    <Typography variant="h5" gutterBottom textAlign="center">Profile</Typography>
+      <Box sx={{ width: "100%", maxWidth: "800px", p: 6, backgroundColor: "white", boxShadow: 3, borderRadius: 2 }}>
+        <Typography variant="h5" gutterBottom textAlign="center">Profile</Typography>
 
-    <Box sx={{ backgroundColor: "#fff", p: 3, borderRadius: 2, boxShadow: 1, mb: 4 }}>
-      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-        <Avatar sx={{ bgcolor: "primary.main", mr: 2, width: 80, height: 80 }}>
-          {currentUser?.name.charAt(0).toUpperCase()}
-        </Avatar>
-        <div>
-          <Typography variant="h6">{currentUser?.name}</Typography>
-          <Typography variant="body1">{currentUser?.email}</Typography>
-          <Typography variant="body1"><strong>Password:</strong> ********</Typography>
-        </div>
-      </Box>
-    </Box>
+        <Box sx={{ backgroundColor: "#fff", p: 3, borderRadius: 2, boxShadow: 1, mb: 4 }}>
+          <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+            <Avatar
+              sx={{ mr: 2, width: 80, height: 80 }}
+              src={currentUser.profileImageUrl || ""}
+            >
+              {currentUser?.name.charAt(0).toUpperCase()}
+            </Avatar>
+            <div>
+              <Typography variant="h6">{currentUser?.name}</Typography>
+              <Typography variant="body1">{currentUser?.email}</Typography>
+              <Typography variant="body1"><strong>Password:</strong> ********</Typography>
+            </div>
+          </Box>
 
-        {isEditing && (
-          <>
-            <Box sx={{ mb: 4 }}>
+          {isEditing && (
+            <>
+              {/* Show Edit Image button, and when clicked, show the file input */}
+              {!imageInputVisible && (
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  onClick={() => setImageInputVisible(true)} // Show image input when clicked
+                  sx={{ mb: 2 }}
+                >
+                  Edit Image
+                </Button>
+              )}
+
+              {imageInputVisible && (
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  style={{ marginBottom: "1rem" }}
+                />
+              )}
+
               <TextField
                 label="Name"
                 value={name}
@@ -82,9 +149,7 @@ const ProfilePage = ({ onClose }: ProfilePageProps) => {
                 variant="outlined"
                 sx={{ mb: 2 }}
               />
-            </Box>
 
-            <Box sx={{ mb: 4 }}>
               <Typography variant="h6" gutterBottom>Change Password</Typography>
               <TextField
                 label="Current Password"
@@ -113,9 +178,9 @@ const ProfilePage = ({ onClose }: ProfilePageProps) => {
               >
                 Update Password
               </Button>
-            </Box>
-          </>
-        )}
+            </>
+          )}
+        </Box>
 
         <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
           <Button
@@ -129,24 +194,23 @@ const ProfilePage = ({ onClose }: ProfilePageProps) => {
           <Button
             variant="outlined"
             color="secondary"
-            onClick={onClose} 
+            onClick={onClose}
             sx={{ width: "48%" }}
           >
             Close
           </Button>
         </Box>
-      </Box>
 
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={() => setSnackbarOpen(false)}
-        message="Password updated successfully"
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      />
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={3000}
+          onClose={() => setSnackbarOpen(false)}
+          message={snackbarMessage}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        />
+      </Box>
     </Box>
   );
 };
 
 export default ProfilePage;
-

@@ -1,4 +1,3 @@
-// components/AssignTask.tsx
 import { useContext, useState } from 'react';
 import {
     TextField,
@@ -11,29 +10,13 @@ import {
     Select,
     SelectChangeEvent,
 } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { UserContext } from '../ContextAPI/UserContext';
 import { useTaskContext } from '../ContextAPI/TaskContext';
-
-const VisuallyHiddenInput = styled('input')({
-    clip: 'rect(0 0 0 0)',
-    clipPath: 'inset(50%)',
-    height: 1,
-    overflow: 'hidden',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    whiteSpace: 'nowrap',
-    width: 1,
-});
 
 type Task = {
     title: string;
     assignedTo: string;
     description: string;
-    fileName?: string;
-    imageUrl?: string;
 };
 
 const AssignTask = () => {
@@ -46,8 +29,6 @@ const AssignTask = () => {
         description: '',
     });
 
-    const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setTask((prev) => ({ ...prev, [name]: value }));
@@ -57,20 +38,10 @@ const AssignTask = () => {
         setTask((prev) => ({ ...prev, assignedTo: e.target.value }));
     };
 
-    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            const imageUrl = URL.createObjectURL(file);
-            setUploadedFile(file);
-            setTask((prev) => ({ ...prev, fileName: file.name, imageUrl }));
-        }
-    };
-
     const handleSubmit = () => {
         if (task.title && task.assignedTo && task.description) {
             addTask(task);
             setTask({ title: '', assignedTo: '', description: '' });
-            setUploadedFile(null);
         } else {
             alert('Please fill in all required fields');
         }
@@ -92,6 +63,18 @@ const AssignTask = () => {
                     value={task.assignedTo}
                     label="Assign To"
                     onChange={handleAssignChange}
+                    sx={{
+                        width: '100%', // Ensure Select takes full width
+                    }}
+                    MenuProps={{
+                        PaperProps: {
+                            style: {
+                                width: 'auto', // Adjust width to fit the content
+                                minWidth: '250px', // Increased minWidth for wider dropdown
+                                maxWidth: '350px', // Increased maxWidth to give more room for longer names
+                            },
+                        },
+                    }}
                 >
                     {users.map((user) => (
                         <MenuItem key={user.email} value={user.email}>
@@ -111,17 +94,6 @@ const AssignTask = () => {
                 value={task.description}
                 onChange={handleChange}
             />
-
-            <Button
-                component="label"
-                variant="contained"
-                startIcon={<CloudUploadIcon />}
-                sx={{ backgroundColor: '#881337', '&:hover': { backgroundColor: '#701a30' } }}
-            >
-                Upload Profile Image
-                <VisuallyHiddenInput type="file" onChange={handleFileUpload} multiple />
-            </Button>
-
             <div className="text-center">
                 <Button variant="contained" color="primary" onClick={handleSubmit}>
                     Submit Task

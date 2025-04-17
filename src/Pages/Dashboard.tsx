@@ -34,7 +34,7 @@ const demoTheme = createTheme({
 const CustomAppTitle = () => {
     return (
         <Box>
-            <Typography variant="h4">Dashboard</Typography>
+            <Typography variant="h4">WorkSphere</Typography>
         </Box>
     );
 };

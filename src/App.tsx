@@ -8,6 +8,8 @@ import Tables from './Components/Tables/Tables';
 // import ProfilePage from './Components/ProfilePage';
 import { useEffect, useState } from 'react';
 import PrivateRoute from './Components/PrivateRoute';
+import { TaskProvider } from "./Components/ContextAPI/TaskContext";
+
 
 const App = () => {
   const [activePage, setActivePage] = useState("dashboard");
@@ -17,6 +19,7 @@ const App = () => {
   }, []);
   return (
     <>
+    <TaskProvider>
       <UserProvider>
         <Router>
           <Routes>
@@ -32,6 +35,7 @@ const App = () => {
           {/* {activePage === "profile" && <ProfilePage />} */}
         </Router>
       </UserProvider>
+      </TaskProvider>
     </>
   );
 };

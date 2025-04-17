@@ -1,4 +1,3 @@
-// components/TaskList.tsx
 import {
     Table, TableBody, TableCell, TableHead, TableRow,
     IconButton, Box, TextField, Avatar, Typography
@@ -7,19 +6,25 @@ import { useTaskContext } from "../ContextAPI/TaskContext";
 import { useContext, useState } from "react";
 import { UserContext } from "../ContextAPI/UserContext";
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
+import SearchIcon from '@mui/icons-material/Search';
+import InputAdornment from '@mui/material/InputAdornment';
 
 const TaskList = () => {
     const { tasks } = useTaskContext();
-    const { users } = useContext(UserContext);
+    const { currentUser, users } = useContext(UserContext);
     const [searchTerm, setSearchTerm] = useState('');
 
     const getUser = (email: string) => users.find((user) => user.email === email);
 
-    const filteredTasks = tasks.filter(
-        (task) =>
-            task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            task.description.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // Filtering tasks based on the assigned user and search term
+    const filteredTasks = tasks.filter((task) => {
+        const user = getUser(task.assignedTo);
+        // Check if the user's name matches the search term (case-insensitive)
+        return (
+            task.assignedTo === currentUser?.email &&
+            (user?.name.toLowerCase().includes(searchTerm.toLowerCase()))
+        );
+    });
 
     return (
         <>
@@ -30,6 +35,13 @@ const TaskList = () => {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     sx={{ width: "300px" }}
+                    InputProps={{
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <SearchIcon sx={{ color: 'gray' }} />
+                            </InputAdornment>
+                        ),
+                    }}
                 />
                 <IconButton color="primary">
                     <AssignmentTurnedInIcon />
@@ -37,35 +49,39 @@ const TaskList = () => {
                 </IconButton>
             </Box>
 
-            <Table>
-                <TableHead sx={{ bgcolor: "lightgray" }}>
-                    <TableRow>
-                        <TableCell>Profile</TableCell>
-                        <TableCell>Title</TableCell>
-                        <TableCell>Assigned To</TableCell>
-                        <TableCell>Description</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {filteredTasks.map((task, idx) => {
-                        const user = getUser(task.assignedTo);
-                        return (
-                            <TableRow key={idx}>
-                                <TableCell>
-                                    {task.imageUrl ? (
-                                        <Avatar alt={task.title} src={task.imageUrl} />
-                                    ) : (
-                                        <Avatar>{task.title[0]}</Avatar>
-                                    )}
-                                </TableCell>
-                                <TableCell>{task.title}</TableCell>
-                                <TableCell>{user?.name || task.assignedTo}</TableCell>
-                                <TableCell>{task.description}</TableCell>
-                            </TableRow>
-                        );
-                    })}
-                </TableBody>
-            </Table>
+            <Table sx={{ tableLayout: "fixed", width: "100%" }}>
+    <TableHead sx={{ bgcolor: "lightgray" }}>
+        <TableRow>
+            <TableCell sx={{ textAlign: "center", width: "25%" }}>Name</TableCell>
+            <TableCell sx={{ textAlign: "center", width: "25%" }}>Title</TableCell>
+            <TableCell sx={{ textAlign: "center", width: "25%" }}>Assigned To</TableCell>
+            <TableCell sx={{ textAlign: "center", width: "25%" }}>Description</TableCell>
+        </TableRow>
+    </TableHead>
+    <TableBody>
+        {filteredTasks.map((task, idx) => {
+            const user = getUser(task.assignedTo);
+            return (
+                <TableRow key={idx}>
+                    <TableCell sx={{ textAlign: "center" }}>
+                        <Box display="flex" alignItems="center" justifyContent="center">
+                            {user?.profileImageUrl ? (
+                                <Avatar alt={user.name} src={user.profileImageUrl} sx={{ mr: 1 }} />
+                            ) : (
+                                <Avatar sx={{ mr: 1 }}>{user?.name?.[0]}</Avatar>
+                            )}
+                            <Typography variant="body1">{user?.name}</Typography>
+                        </Box>
+                    </TableCell>
+                    <TableCell sx={{ textAlign: "center" }}>{task.title}</TableCell>
+                    <TableCell sx={{ textAlign: "center" }}>{user?.email}</TableCell>
+                    <TableCell sx={{ textAlign: "center" }}>{task.description}</TableCell>
+                </TableRow>
+            );
+        })}
+    </TableBody>
+</Table>
+
         </>
     );
 };
