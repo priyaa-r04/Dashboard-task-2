@@ -57,7 +57,7 @@ const ToolbarActionsSearch = ({ onNavigate }: ToolbarActionsSearchProps) => {
                     sx={{ bgcolor: "primary.main" }}
                     src={currentUser?.profileImageUrl || undefined} 
                 >
-                    {currentUser?.profileImageUrl || currentUser?.name.charAt(0).toUpperCase()}
+                    {!currentUser?.profileImageUrl || currentUser?.name.charAt(0).toUpperCase()}
                 </Avatar>
             </IconButton>
             <Menu
