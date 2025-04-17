@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
 import TextField from '@mui/material/TextField';
@@ -6,9 +6,13 @@ import Button from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import * as Yup from 'yup';
-import { UserContext } from "../ContextAPI/UserContext";
+import { UserContext } from "../Components/ContextAPI/UserContext";
 import backgroundImage from '../assets/bg-signup.jpg'
-import { Checkbox, FormControlLabel } from "@mui/material";
+import { Checkbox, CircularProgress, FormControlLabel } from "@mui/material";
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Email is Required'),
@@ -21,6 +25,10 @@ const LoginForm = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [errorSnackbar, setErrorSnackbar] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [loaderState, setLoaderState] = useState(false);
+
+  const [showPassword, setShowPassword] = useState(false);
+  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
   const formik = useFormik({
     initialValues: {
@@ -29,22 +37,22 @@ const LoginForm = () => {
     },
     validationSchema: LoginSchema,
     onSubmit: (values) => {
-      const isValid = checkCredentials(values.email, values.password);
-      if (isValid) {
-        setOpenSnackbar(true);
-        if (rememberMe) {
-          localStorage.setItem("rememberMe", JSON.stringify(values));
+      setLoaderState(true);
+      setTimeout(() => {
+        const isValid = checkCredentials(values.email, values.password);
+        setLoaderState(false);
+        if (isValid) {
+          setOpenSnackbar(true);
+          setTimeout(() => navigate("/dashboard"), 1000);
         } else {
-          localStorage.removeItem("rememberMe");
+          setErrorSnackbar(true);
         }
-        setTimeout(() => navigate("/dashboard"), 2000);
-      } else {
-        setErrorSnackbar(true);
-      }
+      }, 1000);
     },
   });
 
-  const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: string) => {
+
+  const handleSnackbarClose = (_: any | Event, reason?: string) => {
     if (reason === "clickaway") return;
     setOpenSnackbar(false);
     setErrorSnackbar(false);
@@ -96,14 +104,13 @@ const LoginForm = () => {
                 id="password"
                 name="password"
                 label="Password"
-                type={"password"}
+                type={showPassword ? 'text' : 'password'}
                 placeholder="Enter your Password"
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 className="w-full"
                 error={formik.touched.password && Boolean(formik.errors.password)}
                 helperText={formik.touched.password && formik.errors.password}
-
                 sx={{
                   '& .MuiInputLabel-root.Mui-focused': {
                     color: '#881337',
@@ -119,6 +126,15 @@ const LoginForm = () => {
                       borderColor: '#701a30',
                     },
                   },
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={togglePasswordVisibility} edge="end">
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
                 }}
               />
             </div>
@@ -147,12 +163,17 @@ const LoginForm = () => {
                 variant="contained"
                 fullWidth
                 type="submit"
+                disabled={loaderState}
                 sx={{
                   backgroundColor: '#881337',
                   '&:hover': { backgroundColor: '#701a30' }
                 }}
               >
-                Login
+                {loaderState ? (
+                  <CircularProgress size={24} sx={{ color: 'white' }} />
+                ) : (
+                  "Login"
+                )}
               </Button>
             </div>
 
@@ -175,7 +196,7 @@ const LoginForm = () => {
           <Snackbar
             anchorOrigin={{ horizontal: "center", vertical: "top" }}
             open={openSnackbar}
-            autoHideDuration={2000}
+            autoHideDuration={1000}
             onClose={handleSnackbarClose}
           >
             <Alert severity="success" sx={{ width: "100%" }}>
@@ -184,9 +205,9 @@ const LoginForm = () => {
           </Snackbar>
 
           <Snackbar
-          anchorOrigin={{ horizontal: "center", vertical: "top" }}
+            anchorOrigin={{ horizontal: "center", vertical: "top" }}
             open={errorSnackbar}
-            autoHideDuration={2000}
+            autoHideDuration={1000}
             onClose={handleSnackbarClose}
           >
             <Alert severity="error" sx={{ width: "100%" }}>
