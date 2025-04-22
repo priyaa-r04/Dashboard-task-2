@@ -67,7 +67,6 @@ const UserList = ({
                             </Box>
                         </TableCell>
                         <TableCell>Email</TableCell>
-                        {/* <TableCell>Password</TableCell> */}
                         <TableCell>Created Date</TableCell>
                         <TableCell>Active</TableCell>
                         <TableCell>Actions</TableCell>
@@ -84,7 +83,6 @@ const UserList = ({
                             </TableCell>
                             <TableCell>{user.name}</TableCell>
                             <TableCell>{user.email}</TableCell>
-                            {/* <TableCell>{user.password}</TableCell> */}
                             <TableCell>{new Date(user.createdDate).toLocaleDateString()}</TableCell>
                             <TableCell>
                                 <Switch

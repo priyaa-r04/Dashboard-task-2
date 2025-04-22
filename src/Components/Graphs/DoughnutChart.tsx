@@ -1,54 +1,32 @@
-import { useEffect, useRef } from 'react'
-import { getStyle } from '@coreui/utils'
-import { CChart } from '@coreui/react-chartjs'
-import { Chart } from 'chart.js'
-import type { ChartData, ChartOptions } from 'chart.js'
-
-export const DoughnutChart = () => {
-  const chartRef = useRef<Chart<'doughnut'> | null>(null)
-
-  useEffect(() => {
-    const handleColorSchemeChange = () => {
-      const chartInstance = chartRef.current
-      if (chartInstance) {
-        const { options } = chartInstance
-
-        if (options.plugins?.legend?.labels) {
-          options.plugins.legend.labels.color = getStyle('--cui-body-color')
-        }
-
-        chartInstance.update()
-      }
-    }
-
-    document.documentElement.addEventListener('ColorSchemeChange', handleColorSchemeChange)
-
-    return () => {
-      document.documentElement.removeEventListener('ColorSchemeChange', handleColorSchemeChange)
-    }
-  }, [])
-
-  const data: ChartData<'doughnut'> = {
-    labels: ['VueJs', 'EmberJs', 'ReactJs', 'AngularJs'],
+import { Doughnut } from 'react-chartjs-2';
+import { Box } from '@mui/material';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+ChartJS.register(ArcElement, Tooltip, Legend);
+const DoughnutChart = () => {
+  const data = {
+    labels: ['Free Users', 'Premium Users', 'Trial Users'],
     datasets: [
       {
-        backgroundColor: ['#41B883', '#E46651', '#00D8FF', '#DD1B16'],
-        data: [40, 20, 80, 10],
+        label: 'User Types',
+        data: [120, 80, 40],
+        backgroundColor: [
+          'rgba(173,216,230,0.8)',
+          'rgba(255,218,185,0.8)',
+          'rgba(221,160,221,0.8)',
+        ],
+        borderColor: [
+          'rgba(173,216,230,1)',
+          'rgba(255,218,185,1)',
+          'rgba(221,160,221,1)',
+        ],
+        borderWidth: 1,
       },
     ],
-  }
-
-  const options: ChartOptions<'doughnut'> = {
-    responsive: true,
-    maintainAspectRatio: false, 
-    plugins: {
-      legend: {
-        labels: {
-          color: getStyle('--cui-body-color'),
-        },
-      },
-    },
   };
-
-  return <CChart type="doughnut" data={data} options={options} ref={chartRef} />
-}
+  return (
+    <Box sx={{ width: 300, height: 265, m: 2 }}>
+      <Doughnut data={data} />
+    </Box>
+  );
+};
+export default DoughnutChart;

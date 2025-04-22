@@ -1,104 +1,41 @@
-import { useEffect, useRef } from 'react'
-import { getStyle } from '@coreui/utils'
-import { CChart } from '@coreui/react-chartjs'
-import { Chart } from 'chart.js'
-import type { ChartData, ChartOptions } from 'chart.js'
-
-export const LineChart = () => {
-  const chartRef = useRef<Chart<'line'> | null>(null)
-
-  useEffect(() => {
-    const handleColorSchemeChange = () => {
-      const chartInstance = chartRef.current
-      if (chartInstance) {
-        const { options } = chartInstance
-
-        if (options.plugins?.legend?.labels) {
-          options.plugins.legend.labels.color = getStyle('--cui-body-color')
-        }
-
-        if (options.scales?.x) {
-          if (options.scales.x.grid) {
-            options.scales.x.grid.color = getStyle('--cui-border-color-translucent')
-          }
-          if (options.scales.x.ticks) {
-            options.scales.x.ticks.color = getStyle('--cui-body-color')
-          }
-        }
-
-        if (options.scales?.y) {
-          if (options.scales.y.grid) {
-            options.scales.y.grid.color = getStyle('--cui-border-color-translucent')
-          }
-          if (options.scales.y.ticks) {
-            options.scales.y.ticks.color = getStyle('--cui-body-color')
-          }
-        }
-
-        chartInstance.update()
-      }
-    }
-
-    document.documentElement.addEventListener('ColorSchemeChange', handleColorSchemeChange)
-
-    return () => {
-      document.documentElement.removeEventListener('ColorSchemeChange', handleColorSchemeChange)
-    }
-  }, [])
-
-  const data: ChartData<'line'> = {
-    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September'],
+import { Line } from 'react-chartjs-2';
+import { Box } from '@mui/material';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+const LineChart = () => {
+  const data = {
+    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
     datasets: [
       {
-        label: 'My First dataset',
-        backgroundColor: 'rgba(220, 220, 220, 0.2)',
-        borderColor: 'rgba(220, 220, 220, 1)',
-        pointBackgroundColor: 'rgba(220, 220, 220, 1)',
-        pointBorderColor: '#fff',
-        data: [40, 20, 12, 39, 10, 40, 39, 80, 40],
-        fill: true,
-      },
-      {
-        label: 'My Second dataset',
-        backgroundColor: 'rgba(151, 187, 205, 0.2)',
-        borderColor: 'rgba(151, 187, 205, 1)',
-        pointBackgroundColor: 'rgba(151, 187, 205, 1)',
-        pointBorderColor: '#fff',
-        data: [50, 12, 28, 29, 7, 25, 12, 70, 60],
-        fill: true,
+        label: 'Sales over Time',
+        data: [65, 59, 80, 81, 56, 55, 40],
+        fill: false,
+        borderColor: 'rgba(75,192,192,1)',
+        tension: 0.1,
       },
     ],
-  }
-
-  const options: ChartOptions<'line'> = {
-    plugins: {
-      legend: {
-        labels: {
-          color: getStyle('--cui-body-color'),
-        },
-      },
-    },
-    scales: {
-      x: {
-        grid: {
-          color: getStyle('--cui-border-color-translucent'),
-        },
-        ticks: {
-          color: getStyle('--cui-body-color'),
-        },
-        type: 'category',
-      },
-      y: {
-        grid: {
-          color: getStyle('--cui-border-color-translucent'),
-        },
-        ticks: {
-          color: getStyle('--cui-body-color'),
-        },
-        beginAtZero: true,
-      },
-    },
-  }
-
-  return <CChart type="line" data={data} options={options} ref={chartRef} />
-}
+  };
+  return (
+    <Box
+    sx={{
+      display: 'flex',
+      justifyContent: 'center',   
+      alignItems: 'center',       
+      height: '100%',           
+      width: '100%',             
+    }}
+  >
+    <Box
+      sx={{
+        height: '100%',           
+        width: '100%',            
+        maxWidth: '400px',        
+        paddingLeft: '8px',
+      }}
+    >
+      <Line data={data} />
+    </Box>
+  </Box>
+  );
+};
+export default LineChart;
