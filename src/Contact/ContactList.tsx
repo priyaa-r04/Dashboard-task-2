@@ -9,7 +9,17 @@ import {
   Avatar,
   Paper,
   Button,
-} from '@mui/material';
+  IconButton,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from "@mui/material";
+import { useState } from "react";
+import {
+  Delete as DeleteIcon,
+  Visibility as VisibilityIcon,
+} from "@mui/icons-material";
 
 interface User {
   name: string;
@@ -22,9 +32,13 @@ interface Props {
   searchTerm: string;
   users: User[];
   handleDeleteUser: (email: string) => void;
+  handleUpdatePhone: (email: string, phone: string) => void;
 }
 
-const ContactList = ({ searchTerm, users, handleDeleteUser }: Props) => {
+const ContactList = ({ searchTerm, users, handleUpdatePhone }: Props) => {
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<string | null>(null);
+
   const filteredUsers = users.filter((user) => {
     const term = searchTerm.toLowerCase();
     return (
@@ -33,10 +47,25 @@ const ContactList = ({ searchTerm, users, handleDeleteUser }: Props) => {
     );
   });
 
+  const handleDeletePhone = (email: string) => {
+    handleUpdatePhone(email, "");
+    setOpenDeleteDialog(false);
+  };
+
+  const openDeleteConfirmation = (email: string) => {
+    setUserToDelete(email);
+    setOpenDeleteDialog(true);
+  };
+
+  const closeDeleteDialog = () => {
+    setOpenDeleteDialog(false);
+    setUserToDelete(null);
+  };
+
   if (filteredUsers.length === 0) {
     return (
       <Typography variant="body1" sx={{ mt: 2 }}>
-        There is No Contact Details
+        There are no contact details.
       </Typography>
     );
   }
@@ -44,7 +73,7 @@ const ContactList = ({ searchTerm, users, handleDeleteUser }: Props) => {
   return (
     <Paper elevation={3} sx={{ mt: 3 }}>
       <Table>
-        <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
+        <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
           <TableRow>
             <TableCell>Name</TableCell>
             <TableCell>Email</TableCell>
@@ -64,20 +93,65 @@ const ContactList = ({ searchTerm, users, handleDeleteUser }: Props) => {
                 </Box>
               </TableCell>
               <TableCell>{user.email}</TableCell>
-              <TableCell>{user.phone}</TableCell>
               <TableCell>
-                <Button
-                  onClick={() => handleDeleteUser(user.email)}
-                  color="error"
-                  variant="contained"
-                >
-                  Delete
-                </Button>
+                {user.phone ? (
+                  user.phone
+                ) : (
+                  <Typography
+                    variant="body2"
+                    color="textSecondary"
+                    sx={{
+                      textAlign: "center",
+                      justifyContent: "center",
+                      fontWeight: "bold",
+                      width: "100%",
+                    }}
+                  >
+                    -
+                  </Typography>
+                )}
+              </TableCell>
+              <TableCell>
+                <Box display="flex" gap={1}>
+                  <IconButton
+                    color="primary"
+                    onClick={() => alert(`Viewing ${user.name}'s details`)}
+                  >
+                    <VisibilityIcon />
+                  </IconButton>
+                  <IconButton
+                    color="error"
+                    onClick={() => openDeleteConfirmation(user.email)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Box>
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
+
+      <Dialog open={openDeleteDialog} onClose={closeDeleteDialog}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">
+            Are you sure you want to delete the phone number for this contact?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeDeleteDialog} color="secondary">
+            Cancel
+          </Button>
+          <Button
+            onClick={() => userToDelete && handleDeletePhone(userToDelete)}
+            color="primary"
+            variant="contained"
+          >
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Paper>
   );
 };

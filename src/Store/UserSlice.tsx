@@ -6,6 +6,7 @@ interface User {
   phone: string;
   profileImageUrl?: string;
 }
+
 interface UsersState {
   users: User[];
 }
@@ -27,8 +28,14 @@ const usersSlice = createSlice({
     deleteUser: (state, action: PayloadAction<string>) => {
       state.users = state.users.filter((user) => user.email !== action.payload);
     },
+    updatePhone(state, action: PayloadAction<{ email: string; phone: string }>) {
+      const userIndex = state.users.findIndex(user => user.email === action.payload.email);
+      if (userIndex !== -1) {
+        state.users[userIndex].phone = action.payload.phone;
+      }
+    },
   },
 });
 
-export const { setUsers, addUser, deleteUser } = usersSlice.actions;
+export const { setUsers, addUser, updatePhone, deleteUser } = usersSlice.actions;
 export default usersSlice.reducer;

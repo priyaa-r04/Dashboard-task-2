@@ -1,10 +1,17 @@
-import { useState, useEffect } from 'react';
-import { Box, Button, TextField, Typography, InputAdornment, Paper } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import { useDispatch, useSelector } from 'react-redux';
-import { addUser, deleteUser, setUsers } from '../Store/UserSlice'; 
-import ContactDialog from './ContactDialog';
-import ContactList from './ContactList';
+import { useState, useEffect } from "react";
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  InputAdornment,
+  Paper,
+} from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import { useDispatch, useSelector } from "react-redux";
+import { addUser, deleteUser, setUsers, updatePhone } from "../Store/UserSlice";
+import ContactDialog from "./ContactDialog";
+import ContactList from "./ContactList";
 
 interface User {
   name: string;
@@ -15,31 +22,58 @@ interface User {
 
 interface RootState {
   users: {
-    users: User[]; 
+    users: User[];
   };
 }
 
 const Contact = () => {
   const [openDialog, setOpenDialog] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const dispatch = useDispatch();
   const users = useSelector((state: RootState) => state.users.users);
 
   useEffect(() => {
-    const storedUsers = localStorage.getItem('users');
+    const storedUsers = localStorage.getItem("users");
     if (storedUsers) {
       dispatch(setUsers(JSON.parse(storedUsers)));
     }
   }, [dispatch]);
 
-  const handleAddUser = (user: { name: string; email: string; phone: string }) => {
-    dispatch(addUser(user));
-    localStorage.setItem('users', JSON.stringify([...users, user]));
+  const handleAddUser = (user: {
+    name: string;
+    email: string;
+    phone: string;
+  }) => {
+    const existingUserIndex = users.findIndex((u) => u.email === user.email);
+
+    if (existingUserIndex !== -1) {
+      const updatedUsers = [...users];
+      updatedUsers[existingUserIndex] = {
+        ...updatedUsers[existingUserIndex],
+        ...user,
+      };
+
+      dispatch(setUsers(updatedUsers));
+      localStorage.setItem("users", JSON.stringify(updatedUsers));
+    } else {
+      dispatch(addUser(user));
+      const updatedUsers = [...users, user];
+      localStorage.setItem("users", JSON.stringify(updatedUsers));
+    }
   };
 
   const handleDeleteUser = (email: string) => {
     dispatch(deleteUser(email));
-    localStorage.setItem('users', JSON.stringify(users));
+    const updatedUsers = users.filter((user) => user.email !== email);
+    localStorage.setItem("users", JSON.stringify(updatedUsers));
+  };
+
+  const handleUpdatePhone = (email: string, phone: string) => {
+    dispatch(updatePhone({ email, phone }));
+    const updatedUsers = users.map((user) =>
+      user.email === email ? { ...user, phone } : user
+    );
+    localStorage.setItem("users", JSON.stringify(updatedUsers));
   };
 
   return (
@@ -61,30 +95,35 @@ const Contact = () => {
           variant="outlined"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          sx={{ width: '300px' }}
+          sx={{ width: "300px" }}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
-                <SearchIcon sx={{ color: 'gray' }} />
+                <SearchIcon sx={{ color: "gray" }} />
               </InputAdornment>
             ),
           }}
         />
-        <Button variant="contained" color="primary" onClick={() => setOpenDialog(true)}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => setOpenDialog(true)}
+        >
           Add Contact
         </Button>
       </Box>
 
       <ContactList
         searchTerm={searchTerm}
-        users={users} 
-        handleDeleteUser={handleDeleteUser} 
+        users={users}
+        handleDeleteUser={handleDeleteUser}
+        handleUpdatePhone={handleUpdatePhone}
       />
 
       <ContactDialog
         open={openDialog}
         onClose={() => setOpenDialog(false)}
-        onAddUser={handleAddUser} 
+        onAddUser={handleAddUser}
       />
     </Box>
   );

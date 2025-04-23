@@ -8,8 +8,14 @@ interface Props {
 }
 
 const ContactDialog = ({ open, onClose, onAddUser }: Props) => {
-
   const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+  });
+
+  const [errors, setErrors] = useState({
     firstName: '',
     lastName: '',
     email: '',
@@ -23,16 +29,30 @@ const ContactDialog = ({ open, onClose, onAddUser }: Props) => {
     }));
   };
 
-  const handleSubmit = () => {
-    const user = {
-      name: `${formData.firstName} ${formData.lastName}`, 
-      email: formData.email,
-      phone: formData.phone,
+  const validateForm = () => {
+    const newErrors = {
+      firstName: formData.firstName ? '' : 'First name is required',
+      lastName: formData.lastName ? '' : 'Last name is required',
+      email: formData.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) ? '' : 'Invalid email address',
+      phone: formData.phone && /^[0-9]{10}$/.test(formData.phone) ? '' : 'Phone number must be 10 digits',
     };
     
-    onAddUser(user); 
-    onClose();
-    setFormData({ firstName: '', lastName: '', email: '', phone: '' });
+    setErrors(newErrors);
+    
+    return Object.values(newErrors).every((error) => error === '');
+  };
+
+  const handleSubmit = () => {
+    if (validateForm()) {
+      const user = {
+        name: `${formData.firstName} ${formData.lastName}`,
+        email: formData.email,
+        phone: formData.phone,
+      };
+      onAddUser(user);
+      onClose();
+      setFormData({ firstName: '', lastName: '', email: '', phone: '' });
+    }
   };
 
   return (
@@ -47,6 +67,8 @@ const ContactDialog = ({ open, onClose, onAddUser }: Props) => {
             onChange={handleChange}
             fullWidth
             margin="normal"
+            error={!!errors.firstName}
+            helperText={errors.firstName}
           />
           <TextField
             label="Last Name"
@@ -55,6 +77,8 @@ const ContactDialog = ({ open, onClose, onAddUser }: Props) => {
             onChange={handleChange}
             fullWidth
             margin="normal"
+            error={!!errors.lastName}
+            helperText={errors.lastName}
           />
         </Box>
         <TextField
@@ -64,6 +88,8 @@ const ContactDialog = ({ open, onClose, onAddUser }: Props) => {
           onChange={handleChange}
           fullWidth
           margin="normal"
+          error={!!errors.email}
+          helperText={errors.email}
         />
         <TextField
           label="Phone"
@@ -72,13 +98,15 @@ const ContactDialog = ({ open, onClose, onAddUser }: Props) => {
           onChange={handleChange}
           fullWidth
           margin="normal"
+          error={!!errors.phone}
+          helperText={errors.phone}
         />
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="secondary">
           Cancel
         </Button>
-        <Button onClick={handleSubmit} variant="contained">
+        <Button onClick={handleSubmit} variant="contained" disabled={!!Object.values(errors).find((error) => error)}>
           Add Contact
         </Button>
       </DialogActions>
