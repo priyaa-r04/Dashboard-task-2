@@ -55,6 +55,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       const storedUser = localStorage.getItem("currentUser");
       return storedUser ? JSON.parse(storedUser) : null;
     } catch (e) {
+      console.log(e);
       return null;
     }
   });

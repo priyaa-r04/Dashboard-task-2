@@ -19,7 +19,9 @@ import { useState } from "react";
 import {
   Delete as DeleteIcon,
   Visibility as VisibilityIcon,
+  Edit as EditIcon,
 } from "@mui/icons-material";
+import EditUserModal from "../Contact/EditUserModal";
 
 interface User {
   name: string;
@@ -38,6 +40,8 @@ interface Props {
 const ContactList = ({ searchTerm, users, handleUpdatePhone }: Props) => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const filteredUsers = users.filter((user) => {
     const term = searchTerm.toLowerCase();
@@ -60,6 +64,16 @@ const ContactList = ({ searchTerm, users, handleUpdatePhone }: Props) => {
   const closeDeleteDialog = () => {
     setOpenDeleteDialog(false);
     setUserToDelete(null);
+  };
+
+  const handleOpenEditModal = (user: User) => {
+    setSelectedUser(user);
+    setEditModalOpen(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setEditModalOpen(false);
+    setSelectedUser(null);
   };
 
   if (filteredUsers.length === 0) {
@@ -120,6 +134,12 @@ const ContactList = ({ searchTerm, users, handleUpdatePhone }: Props) => {
                     <VisibilityIcon />
                   </IconButton>
                   <IconButton
+                    color="info"
+                    onClick={() => handleOpenEditModal(user)}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
                     color="error"
                     onClick={() => openDeleteConfirmation(user.email)}
                   >
@@ -152,6 +172,14 @@ const ContactList = ({ searchTerm, users, handleUpdatePhone }: Props) => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {selectedUser && (
+        <EditUserModal
+          open={editModalOpen}
+          onClose={handleCloseEditModal}
+          selectedUser={selectedUser}
+        />
+      )}
     </Paper>
   );
 };
