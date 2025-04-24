@@ -1,4 +1,3 @@
-import React from 'react';
 import { Pie } from 'react-chartjs-2';
 import { Box } from '@mui/material';
 import {
@@ -25,8 +24,8 @@ const PieChart = () => {
         label: 'Tasks',
         data: [70, 20, 10],
         backgroundColor: [
-          'rgba(204, 255, 204, 1)', // Pastel Green
-          'rgba(255, 255, 204, 1)', // Pastel Yellow
+          'rgba(204, 255, 204, 1)',
+          'rgba(255, 255, 204, 1)',
           'rgba(255, 204, 204, 1)',
         ],
         borderColor: [
@@ -40,9 +39,11 @@ const PieChart = () => {
   };
 
   const options = {
+    responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'bottom' as const,
+        position: 'bottom' as const, 
       },
       datalabels: {
         color: '#000',
@@ -63,8 +64,10 @@ const PieChart = () => {
   };
 
   return (
-    <Box sx={{ width: 300, height: 260, m: 2 }}>
-      <Pie data={data} options={options} />
+    <Box sx={{ width: '100%', height: { xs: 250, sm: 300 }, p: 2 }}>
+      <Box sx={{ position: 'relative', width: '100%', height: '100%' }}>
+        <Pie data={data} options={options} />
+      </Box>
     </Box>
   );
 };

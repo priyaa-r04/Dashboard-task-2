@@ -25,10 +25,20 @@ const RadarChart = () => {
     ],
   };
 
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom' as const, 
+      },
+    },
+  };
+
   return (
-    <div className="flex justify-center items-center h-full w-full">
-      <div className="flex justify-center items-center max-w-[400px] w-full h-[290px]">
-        <Radar data={data} />
+    <div className="w-full h-[260px] sm:h-[300px] p-2">
+      <div className="relative w-full h-full max-w-[400px] mx-auto">
+        <Radar data={data} options={options} />
       </div>
     </div>
   );
