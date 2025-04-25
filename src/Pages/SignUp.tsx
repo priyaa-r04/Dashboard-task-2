@@ -14,7 +14,6 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
-
 const SignupSchema = Yup.object().shape({
     name: Yup
         .string()
@@ -91,7 +90,7 @@ const SignUp = () => {
 
 
     });
-    const handleClose = (_: any | Event, reason: string) => {
+    const handleClose = (_: React.SyntheticEvent | Event, reason: string) => {
         if (reason === 'clickaway') return;
         setOpen(false);
     };

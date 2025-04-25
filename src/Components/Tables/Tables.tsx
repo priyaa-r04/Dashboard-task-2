@@ -73,7 +73,7 @@ const Tables = () => {
         setConfirmDialogOpen(false);
     };
 
-    const handleSelectAll = (event: any) => {
+    const handleSelectAll = (event: { target: { checked: boolean } }) => {
         if (event.target.checked) {
             setSelectedUserEmails(users.map((user) => user.email));
         } else {
@@ -89,7 +89,7 @@ const Tables = () => {
 
     const handleChangePage = (newPage: number) => setPage(newPage);
 
-    const handleChangeRowsPerPage = (event: any) => {
+    const handleChangeRowsPerPage = (event: { target: { value: string } }) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };

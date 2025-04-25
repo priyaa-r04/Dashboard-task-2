@@ -11,7 +11,6 @@ import { TaskProvider } from "./Components/ContextAPI/TaskContext";
 
 const App = () => {
   return (
-    <>
     <TaskProvider>
       <UserProvider>
         <Router>
@@ -25,7 +24,6 @@ const App = () => {
         </Router>
       </UserProvider>
       </TaskProvider>
-    </>
   );
 };
 
