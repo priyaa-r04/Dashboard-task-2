@@ -1,12 +1,12 @@
 import { Box, Button, Typography, Tabs, Tab } from "@mui/material";
-import { useState } from "react";
+import { useState , SyntheticEvent } from "react";
 import TaskList from "./TaskList";
 import AssignTask from "./AssignTask";
 
 const Tasks = () => {
     const [tab, setTab] = useState<"list" | "assign">("list");
 
-    const handleTabChange = (_: any, newValue: "list" | "assign") => {
+    const handleTabChange = (_: SyntheticEvent, newValue: "list" | "assign") => {
         setTab(newValue);
     };
 

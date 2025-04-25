@@ -1,4 +1,5 @@
-import { createContext, useState, useEffect, ReactNode, } from "react";
+import { useState, useEffect, ReactNode, } from "react";
+import { UserContext } from "../../utils/userContext";
 
 export type User = {
   name: string;
@@ -8,30 +9,6 @@ export type User = {
   active: boolean;
   profileImageUrl?: string;
 };
-
-type UserContextType = {
-  users: User[];
-  currentUser: User | null;
-  addUser: (user: User) => boolean;
-  deleteUser: (email: string) => void;
-  checkCredentials: (email: string, password: string) => boolean;
-  setCurrentUser: (user: User | null) => void;
-  setUsers: (users: User[]) => void;
-  toggleActive: (email: string, isActive: boolean) => void;
-  updateProfileImage: (email: string, newImageUrl: string) => void; 
-};
-
-export const UserContext = createContext<UserContextType>({
-  users: [],
-  currentUser: null,
-  addUser: () => false,
-  deleteUser: () => {},
-  checkCredentials: () => false,
-  setCurrentUser: () => {},
-  setUsers: () => {}, 
-  toggleActive: () => {},
-  updateProfileImage: () => {},
-});
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [users, setUsers] = useState<User[]>(() => {
@@ -55,6 +32,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       const storedUser = localStorage.getItem("currentUser");
       return storedUser ? JSON.parse(storedUser) : null;
     } catch (e) {
+      console.log(e);
       return null;
     }
   });
