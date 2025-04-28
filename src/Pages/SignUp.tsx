@@ -1,33 +1,56 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import TextField from '@mui/material/TextField';
 import { useFormik } from 'formik';
 import Button from '@mui/material/Button';
-import backgroundImage from '../assets/bg-signup.jpg'
+import backgroundImage from '../assets/bg-signup.jpg';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
-import { UserContext } from "../ContextAPI/UserContext";
+import { User, UserContext } from "../Components/ContextAPI/UserContext";
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert'
+import CircularProgress from '@mui/material/CircularProgress';
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 const SignupSchema = Yup.object().shape({
-    name: Yup.string().required('Name is Required'),
-    email: Yup.string().email('Invalid email').required('Email is Required'),
-    password: Yup.string().min(6, 'Password length must be 6').required('Password is Required'),
+    name: Yup
+        .string()
+        .matches(/^[a-zA-Z\s]+$/, 'Name must contain only letters and spaces')
+        .required('Name is Required'),
+    email: Yup
+    .string()
+    .matches(/^[a-zA-Z0-9._%+-]+@gmail\.com$/, "Email must be a valid Gmail address.")
+    .email('Invalid email')
+    .required('Email is Required')
+    .test('email-exists', 'Email already exists!', function (value) {
+        if (!value) return true;
+        try {
+            const storedUsers = localStorage.getItem("users");
+            const users: User[] = storedUsers ? JSON.parse(storedUsers) : [];
+            return !users.some((user) => user.email === value);
+        } catch (e) {
+            console.error("Yup email test error:", e);
+            return true;
+        }
+    }),
+    password: Yup
+        .string()
+        .min(6, 'Password length must be 6')
+        .matches(/^(?=.*[A-Z])(?=.*[\d!@#$%^&*(),.?":{}|<>]).*$/,
+            'Password must contain at least one uppercase letter and one number or special character')
+        .required('Password is Required'),
 });
 
 const SignUp = () => {
     const { addUser } = useContext(UserContext)!;
+    const [loaderState, setLoaderState] = useState(false);
     const [open, setOpen] = useState(false);
-    const [loading , setLoading] = useState(false);
-
     const navigate = useNavigate();
-
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            setLoading(false);
-        }, 2000);
-        return () => clearTimeout(timeout);
-    });
+    const [showPassword, setShowPassword] = useState(false);
+    
+    const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
     const formik = useFormik({
         initialValues: {
@@ -37,20 +60,40 @@ const SignUp = () => {
         },
         validationSchema: SignupSchema,
         onSubmit: (values) => {
-            console.log(values);
-            addUser(values);
-            setOpen(true);
-            setTimeout(() => navigate("/login"), 2000);
-            console.log(open);
+            setLoaderState(true);
+
+            const userData: User = {
+                ...values,
+                createdDate: new Date().toISOString(),
+                active: true,
+            };
+
+            try {
+                const storedUsers = localStorage.getItem("users");
+                const usersFromStorage: User[] = storedUsers ? JSON.parse(storedUsers) : [];
+
+                usersFromStorage.push(userData);
+                localStorage.setItem("users", JSON.stringify(usersFromStorage));
+                addUser(userData);
+
+                setOpen(true);
+
+            setTimeout(() => {
+                    navigate("/login");
+                }, 1000);
+            } catch (error) {
+                console.error("Error adding user:", error);
+            } finally {
+                setLoaderState(false);
+            }
         },
 
 
     });
-    const handleClose = (event: React.SyntheticEvent | Event, reason: string) => {
+    const handleClose = (_: React.SyntheticEvent | Event, reason: string) => {
         if (reason === 'clickaway') return;
         setOpen(false);
     };
-
 
     return (
         <>
@@ -105,8 +148,7 @@ const SignUp = () => {
                                 onBlur={formik.handleBlur}
                                 className="w-full"
                                 error={formik.touched.email && Boolean(formik.errors.email)}
-                                helperText={formik.touched.email && formik.errors.email}
-
+                        helperText={formik.touched.email && formik.errors.email}
                                 sx={{
                                     '& .MuiInputLabel-root.Mui-focused': {
                                         color: '#881337',
@@ -131,13 +173,22 @@ const SignUp = () => {
                                 id="password"
                                 name="password"
                                 label="Password"
-                                type={'password'}
-                                value={formik.values.password}
+                                type={showPassword ? 'text' : 'password'}
+                                placeholder="Enter your Password"
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
                                 className="w-full"
                                 error={formik.touched.password && Boolean(formik.errors.password)}
                                 helperText={formik.touched.password && formik.errors.password}
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton onClick={togglePasswordVisibility} edge="end">
+                                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ),
+                                }}
                                 sx={{
                                     '& .MuiInputLabel-root.Mui-focused': {
                                         color: '#881337',
@@ -154,29 +205,49 @@ const SignUp = () => {
                                         },
                                     },
                                 }}
+                                
                             />
                         </div>
-                        <div>
+                        <div className="mt-4 text-center">
                             <Button
-                                loading={loading}
                                 color="primary"
                                 variant="contained"
                                 fullWidth
                                 type="submit"
-                                sx={{ backgroundColor: '#881337', '&:hover': { backgroundColor: '#701a30' } }}>
-                                Sign Up
+                                disabled={loaderState}
+                                sx={{ backgroundColor: '#881337', '&:hover': { backgroundColor: '#701a30' } }}
+                            >
+                                {loaderState ? (
+                                    <CircularProgress size={24} sx={{ color: 'white' }} />
+                                ) : (
+                                    "Sign Up"
+                                )}
                             </Button>
                         </div>
                     </form>
+
+                    <div className="text-center mt-4">
+                        <p className="text-gray-600">
+                            Already Registered?{" "}
+                            <span
+                                className="font-semibold cursor-pointer hover:underline"
+                                style={{ color: "#B02A47" }}
+                                onClick={() => navigate("/login")}
+                            >
+                                Login Here
+                            </span>
+                        </p>
+                    </div>
+
                     <Snackbar
                         anchorOrigin={{ horizontal: "center", vertical: "top" }}
                         open={open}
-                        autoHideDuration={2000}
-                        onClose={handleClose}>
-
+                        autoHideDuration={1000}
+                        onClose={handleClose}
+                    >
                         <Alert severity="success" sx={{ width: '100%' }}>
-                            User successfully registered!
-                        </Alert>
+                        User successfully registered!
+                    </Alert>
                     </Snackbar>
 
                 </div>
